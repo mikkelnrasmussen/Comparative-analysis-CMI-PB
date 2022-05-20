@@ -1,5 +1,5 @@
 ---
-title: "Study 12 - Transcriptome profiling in blood before and after hepatitis B vaccination shows significant differences in gene expression between responders and non-responders (PMID: 30205979)"
+title: "Study 8 - Transcriptome profiling in blood before and after hepatitis B vaccination shows significant differences in gene expression between responders and non-responders (PMID: 30205979)"
 author: "Mikkel Niklas Rasmussen"
 date: "3/9/2022"
 output: html_document
