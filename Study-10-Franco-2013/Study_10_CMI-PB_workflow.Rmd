@@ -29,7 +29,7 @@ suppressMessages(library("readxl"))
 suppressMessages(library("tibble"))
 
 # Load functions for evaluating gene signatures
-source('../../R/functions/geneModelEvaluate.R')
+source('../../R/functions/modelEvaluate.R')
 
 ```
 
