@@ -32,7 +32,7 @@ suppressMessages(library("tibble"))
 suppressMessages(library("readxl"))
 
 # Load functions for evaluating gene signatures
-source('../../R/functions/geneModelEvaluate.R')
+source('../../R/functions/modelEvaluate.R')
 source("../dlda/internals.r")
 
 ```
