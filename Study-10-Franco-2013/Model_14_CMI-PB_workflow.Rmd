@@ -1,0 +1,275 @@
+---
+title: "Study 14 - Integrative genomic analysis of the human immune response to influenza vaccination (PMID: 23878721)"
+author: "Mikkel Niklas Rasmussen"
+date: "3/9/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### Applying the gene expression at day 0 which correlated with the antibody response to influenza vaccination in the study by Franco et al. (PMID: 23878721) on the CMI-PD dataset
+
+```{r load libaries, echo=FALSE}
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+
+suppressMessages(library('data.table'))
+suppressMessages(library('dplyr'))
+suppressMessages(library('tidyr'))
+suppressMessages(library('Biobase'))
+suppressMessages(library('DESeq2'))
+suppressMessages(library('pROC'))
+suppressMessages(library("ggplot2"))
+suppressMessages(library("RCurl"))
+suppressMessages(library("readr"))
+suppressMessages(library("biomaRt"))
+suppressMessages(library("Rcpp"))
+suppressMessages(library("readxl"))
+suppressMessages(library("tibble"))
+
+# Load functions for evaluating gene signatures
+source('../../R/functions/geneModelEvaluate.R')
+
+```
+
+#### Load the CMI-PB 2020 datasets
+
+```{r load data}
+
+DATA_DIR <- "../../Data/Pre_process/cmi-pb-multiomics/results/main/cmi_pb_datasets/processed/full"
+
+# Info table (meta data)
+meta.2020 <- fread(file.path(DATA_DIR, "meta.2020.pivoted.tsv.gz"))
+meta.2021 <- fread(file.path(DATA_DIR, "meta.2021.pivoted.tsv.gz"))
+specimen.table.2020 <- fread("../../Data/2021_cmipb_challenge/2020LD_specimen.csv")
+specimen.table.2021 <- fread("../../Data/2021_cmipb_challenge/2021BD_specimen.csv")
+
+# Antibody titer data
+ab.titer.2020 <- fread("../../Data/2021_cmipb_challenge/2020LD_ab_titer.csv")
+ab.titer.2021.day0 <- fread("../../Data/2021_cmipb_challenge/2021BD_ab_titer.csv")
+ab.titer.2021.day14 <- fread("../../Data/2021_cmipb_challenge/2021_ab_titer_day14.csv")
+
+# Gene expression data for day 0
+ge.TPM.2020.day0 <- fread(file.path(DATA_DIR, "rnaseq_tpm.2020.day0.pivoted.tsv.gz"))
+ge.TPM.2021.day0 <- fread(file.path(DATA_DIR, "rnaseq_tpm.2021.day0.pivoted.tsv.gz"))
+
+```
+
+## Step 1: Preprocess CMI-PB 2020 antibody titer data
+
+```{r}
+
+#### Antibody titer data
+# Normalized antibody titer data by baseline median
+abt.2020.all <- ab.titer.2020 %>% 
+   filter(antigen %in% c('PT', 'PRN', 'FHA', 'FIM2/3')) %>% 
+   unite(isotype_antigen, c("isotype", "antigen"), sep = "-") %>% 
+   inner_join(., specimen.table.2020 %>% dplyr::select(specimen_id, subject_id, 
+                                                  planned_day_relative_to_boost), 
+              by='specimen_id') %>% 
+   filter(planned_day_relative_to_boost %in% c(0, 1, 3, 7, 14, 30)) %>% 
+   dplyr::rename(timepoint = planned_day_relative_to_boost) %>% 
+   tibble()
+
+# Select the subject that have data day 0 and 14
+subjects.day0 <- unique(abt.2020.all[abt.2020.all$timepoint == 0, ]$subject_id)
+subjects.day14 <- unique(abt.2020.all[abt.2020.all$timepoint == 14, ]$subject_id)
+ids <- intersect(subjects.day0, subjects.day14)
+
+# Subset antibody titer
+abt.2020.subset <- abt.2020.all[abt.2020.all$subject_id %in% ids, ]
+abt.2020.day0 <- abt.2020.subset[abt.2020.subset$timepoint == 0, ]
+abt.2020.day14 <- abt.2020.subset[abt.2020.subset$timepoint == 14, ]
+
+```
+
+## Step 2: Transpose the CMI-PB 2020 TPM normalized expression data
+
+```{r pre-process gene data}
+
+# Tranpose the TPM normalized gene expression data
+ge.TPM.2020.day0.T <- ge.TPM.2020.day0 %>% 
+   tibble::column_to_rownames('subject_id') %>% 
+   t()
+
+```
+ 
+## Step 3: Load day 0 genes correlated with the response to the influenza vaccination
+
+```{r}
+
+# Load table with probe IDs, gene_symbols, day and correlation value from 
+# original study
+df.corr.genes <- read_excel("../elife-00299-supp1-v2.xlsx", sheet="Table 3",
+                            skip = 2, col_names=c("probe_ID", "gene_symbol",
+                                                  "day_of_max_corr", "corr"))
+# Extract probe IDs and gene symbols for day0 genes
+df.day0.genes <- df.corr.genes[df.corr.genes$day_of_max_corr == "Day0", ]
+probeIDs <- df.day0.genes$probe_ID
+
+# Select the gene signature and define the up- and downregulated genes
+gene.sig <- df.day0.genes$gene_symbol
+gene.sig <- gene.sig[!is.na(gene.sig)]
+genes.up <- df.day0.genes[df.day0.genes$corr > 0, ]$gene_symbol
+genes.up <- genes.up[!is.na(genes.up)]
+genes.down <- df.day0.genes[df.day0.genes$corr < 0, ]$gene_symbol
+genes.down <- genes.down[!is.na(genes.down)]
+
+```
+
+## Step 3: Evaluate the predictive power of the day 0 genes correlated with the day 14 influenza vaccination response 
+
+```{r model evaluation}
+
+# Isotype-antigens which are considered the most important
+selected.iso.ag <- c("IgG-PT", "IgG-FHA",   "IgG-PRN", "IgG1-PT",
+                     "IgG1-FHA", "IgG4-PT", "IgG4-FHA")
+
+################ TPM normalized gene expression ###############
+# Calculate the gene signature score with TPM normalized gene expression
+df.gene.sig.2020.pred.TPM <- geneSigCalc(gene.ex.data=ge.TPM.2020.day0.T, 
+                                    score='missing', 
+                                    gene.sig=gene.sig, 
+                                    genes.up=genes.up, 
+                                    genes.down=genes.down,
+                                    post.ab.data=abt.2020.day14,
+                                    pre.ab.data=abt.2020.day0,
+                                    filter.ab.ag=selected.iso.ag,
+                                    verbose=TRUE)
+
+# Evaluate gene signature with TPM normalized gene expression
+Franco.2013.gene.sig.2020.results.TPM <- evaluateModel(df.prediction=df.gene.sig.2020.pred.TPM, 
+                                                       direction='missing',
+                                                       N.perm = 1000,
+                                                       score.label='Gene signature score',
+                                                       add.to.title='- TPM normalized',
+                                                       fn1='geneSig_vs_day14_heatmap_TPM',
+                                                       fn2='geneSig_vs_day14_correlation_TPM',
+                                                       fn3='geneSig_vs_FC_heatmap_TPM',
+                                                       fn4='geneSig_vs_FC_correlation_TPM',
+                                                       fn5='geneSig_vs_day14_AUC_TPM',
+                                                       fn6='geneSig_vs_day14_boxplot_TPM',
+                                                       fn7='geneSig_vs_FC_AUC_TPM',
+                                                       fn8='geneSig_vs_FC_boxplot_TPM',
+                                                       path = 'Results/2020/TPM/GeneSig/')
+
+# Save results
+save(Franco.2013.gene.sig.2020.results.TPM, 
+     file = "Results/2020/TPM/GeneSig/Franco.2013.gene.sig.2020.results.TPM.RData")
+
+```
+
+## Step 4: Pre-process CMI-PB 2021 antibody titer data
+
+```{r}
+
+# Normalized antibody titer data by baseline median
+ab.titer.day0.2021.all <- ab.titer.2021.day0 %>% 
+   filter(antigen %in% c('PT', 'PRN', 'FHA', 'FIM2/3')) %>% 
+   unite(isotype_antigen, c("isotype", "antigen"), sep = "-") %>% 
+   inner_join(., specimen.table.2021 %>% dplyr::select(specimen_id, subject_id, 
+                                                  planned_day_relative_to_boost), 
+              by='specimen_id') %>% 
+   dplyr::rename(timepoint = planned_day_relative_to_boost) %>% 
+   tibble()
+
+ab.titer.subject.ids <- unique(ab.titer.day0.2021.all$subject_id)
+abt.2021.day0 <- ab.titer.day0.2021.all[ab.titer.day0.2021.all$timepoint == 0, ]
+abt.2021.day0 <- abt.2021.day0 %>% 
+   filter(isotype_antigen %in% selected.iso.ag)
+
+# Change format of the day 14 antibody titers
+abt.2021.day14 <- ab.titer.2021.day14 %>% 
+   separate(task, into=c("task", "antigen"), sep = "\\) ") %>% 
+   dplyr::mutate(isotype_antigen = recode(antigen, 
+                                          `Pertussis Toxin` = "IgG-PT", 
+                                          `FHA` = 'IgG-FHA', 
+                                          `Pertactin` =  'IgG-PRN',
+                                          `IgG1 - Pertussis toxin` = "IgG1-PT",
+                                          `IgG1 - FHA` = "IgG1-FHA",
+                                          `IgG4 - Pertussis toxin` = "IgG4-PT",
+                                          `IgG4 - FHA` = "IgG4-FHA"))
+
+```
+
+## Step 5: Transpose the CMI-PB 2021 TPM normalized expression data
+
+```{r pre-process gene data}
+
+# Subset gene expression data based on subjects with antibody titers
+ge.TPM.2021.day0 <- ge.TPM.2021.day0[ge.TPM.2021.day0$subject_id 
+                                     %in% ab.titer.subject.ids, ]
+
+# Tranpose the TPM normalized gene expression data
+ge.TPM.2021.day0.T <- ge.TPM.2021.day0 %>% 
+   tibble::column_to_rownames('subject_id') %>% 
+   t()
+
+```
+
+## Step 6: Make predictions for the CMI-PB 2021 data
+
+```{r}
+
+################ TPM normalized gene expression ###############
+# Calculate the gene signature score with TPM normalized gene expression
+df.gene.sig.pred.2021 <- geneSigCalc(gene.ex.data=ge.TPM.2021.day0.T, 
+                                     score='missing', 
+                                     gene.sig=gene.sig, 
+                                     genes.up=genes.up, 
+                                     genes.down=genes.down,
+                                     verbose=TRUE)
+# Read submisson format
+submission.format <- fread("../../Data/2021_cmipb_challenge/2021_submission_format.tsv") %>% 
+   dplyr::rename(subject_id = Subject_ID)
+
+# HBV pre-vaccine transfer signature 2021 predictions
+Franco.2013.gene.sig.2021.pred <- submission.format %>% 
+   left_join(., df.gene.sig.pred.2021, by="subject_id")
+Franco.2013.gene.sig.2021.pred[, c(5:11)] <- Franco.2013.gene.sig.2021.pred$rank.predictor
+Franco.2013.gene.sig.2021.pred <- Franco.2013.gene.sig.2021.pred[,c(1:18)] %>% 
+   dplyr::rename(Subject_ID = subject_id)
+# Save predictions
+write.table(Franco.2013.gene.sig.2021.pred, 
+            file = "Results/2021_predictions/franco_2013_gene_sig_CMI-PB_2021.tsv",
+            quote=FALSE, sep='\t', row.names = FALSE)
+
+
+```
+
+## Step 7: Evaluate the day 0 genes correlated with the day 14 influenza vaccination response on the CMI-PB 2021 dataset
+
+```{r model evaluation}
+
+# Calculate the gene signature score with TPM normalized gene expression
+df.gene.sig.2021.pred <- geneSigCalc(gene.ex.data=ge.TPM.2021.day0.T, 
+                                     score='missing', 
+                                     gene.sig=gene.sig, 
+                                     genes.up=genes.up, 
+                                     genes.down=genes.down,
+                                     post.ab.data=abt.2021.day14,
+                                     pre.ab.data=abt.2021.day0,
+                                     filter.ab.ag=selected.iso.ag,
+                                     verbose=TRUE)
+
+# Evaluate gene signature with TPM normalized gene expression
+Franco.2013.gene.sig.2021.results <- evaluateModel(df.prediction=df.gene.sig.2021.pred, 
+                                                   direction='missing',
+                                                   N.perm = 1000,
+                                                   score.label='Gene signature score',
+                                                   add.to.title='- TPM normalized',
+                                                   fn1='geneSig_vs_day14_heatmap',
+                                                   fn2='geneSig_vs_day14_correlation',
+                                                   fn3='geneSig_vs_FC_heatmap',
+                                                   fn4='geneSig_vs_FC_correlation',
+                                                   fn5='geneSig_vs_day14_AUC',
+                                                   fn6='geneSig_vs_day14_boxplot',
+                                                   fn7='geneSig_vs_FC_AUC',
+                                                   fn8='geneSig_vs_FC_boxplot',
+                                                   path = 'Results/2021/GeneSig/')
+
+# Save results
+save(Franco.2013.gene.sig.2021.results, 
+     file = "Results/2021/GeneSig/Franco.2013.gene.sig.2021.results.RData")
+```
