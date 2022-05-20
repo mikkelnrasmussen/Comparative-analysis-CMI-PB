@@ -1,5 +1,5 @@
 ---
-title: "Study 14 - Integrative genomic analysis of the human immune response to influenza vaccination (PMID: 23878721)"
+title: "Study 10 - Integrative genomic analysis of the human immune response to influenza vaccination (PMID: 23878721)"
 author: "Mikkel Niklas Rasmussen"
 date: "3/9/2022"
 output: html_document
