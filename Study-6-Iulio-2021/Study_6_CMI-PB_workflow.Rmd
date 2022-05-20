@@ -1,5 +1,5 @@
 ---
-title: "Study 7 - Transfer transcriptomic signatures for infectious diseases (PMID: 34031243)"
+title: "Study 6 - Transfer transcriptomic signatures for infectious diseases (PMID: 34031243)"
 author: "Mikkel Niklas Rasmussen"
 date: "4/19/2022"
 output: html_document
