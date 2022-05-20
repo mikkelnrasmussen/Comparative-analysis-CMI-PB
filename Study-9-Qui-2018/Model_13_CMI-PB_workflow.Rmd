@@ -1,0 +1,303 @@
+---
+title: "Study 13 - Significant transcriptome and cytokine changes in hepatitis B vaccine non-responders revealed by genome-wide comparative analysis (PMID: )"
+author: "Mikkel Niklas Rasmussen"
+date: "3/3/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### Applying the Naive Bayes classifier and the differential genomic signatures in PBMCs between the non-responder and responder presented in study by Qiu et al. (PMID: 29580160) on the CMI-PD dataset
+
+```{r load libaries, echo=FALSE}
+
+rm(list=ls())
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+
+suppressMessages(library('data.table'))
+suppressMessages(library('dplyr'))
+suppressMessages(library('tidyr'))
+suppressMessages(library('Biobase'))
+suppressMessages(library('DESeq2'))
+suppressMessages(library('pROC'))
+suppressMessages(library("ggplot2"))
+suppressMessages(library("biomaRt"))
+suppressMessages(library("jsonlite"))
+suppressMessages(library("Rcpp"))
+suppressMessages(library("readxl"))
+suppressMessages(library("jsonlite"))
+suppressMessages(library("readxl"))
+suppressMessages(library("tibble"))
+
+# Load functions for evaluating gene signatures
+source('../../R/functions/geneModelEvaluate.R')
+
+```
+
+#### Load the CMI-PB 2020 datasets
+
+```{r load data}
+
+DATA_DIR <- "../../Data/Pre_process/cmi-pb-multiomics/results/main/cmi_pb_datasets/processed/full"
+
+# Info table (meta data)
+meta.2020 <- fread(file.path(DATA_DIR, "meta.2020.pivoted.tsv.gz"))
+meta.2021 <- fread(file.path(DATA_DIR, "meta.2021.pivoted.tsv.gz"))
+specimen.table.2020 <- fread("../../Data/2021_cmipb_challenge/2020LD_specimen.csv")
+specimen.table.2021 <- fread("../../Data/2021_cmipb_challenge/2021BD_specimen.csv")
+
+# Antibody titer data
+ab.titer.2020 <- fread("../../Data/2021_cmipb_challenge/2020LD_ab_titer.csv")
+ab.titer.2021.day0 <- fread("../../Data/2021_cmipb_challenge/2021BD_ab_titer.csv")
+ab.titer.2021.day14 <- fread("../../Data/2021_cmipb_challenge/2021_ab_titer_day14.csv")
+
+# Gene expression data for day 0
+ge.TPM.2020.day0 <- fread(file.path(DATA_DIR, "rnaseq_tpm.2020.day0.pivoted.tsv.gz"))
+ge.TPM.2021.day0 <- fread(file.path(DATA_DIR, "rnaseq_tpm.2021.day0.pivoted.tsv.gz"))
+
+```
+
+## Step 1: Preprocess CMI-PB 2020 antibody titer data
+
+```{r}
+
+#### Antibody titer data
+# Normalized antibody titer data by baseline median
+abt.2020.all <- ab.titer.2020 %>% 
+   filter(antigen %in% c('PT', 'PRN', 'FHA', 'FIM2/3')) %>% 
+   unite(isotype_antigen, c("isotype", "antigen"), sep = "-") %>% 
+   inner_join(., specimen.table.2020 %>% dplyr::select(specimen_id, subject_id, 
+                                                  planned_day_relative_to_boost), 
+              by='specimen_id') %>% 
+   filter(planned_day_relative_to_boost %in% c(0, 1, 3, 7, 14, 30)) %>% 
+   dplyr::rename(timepoint = planned_day_relative_to_boost) %>% 
+   tibble()
+
+# Select the subject that have data day 0 and 14
+subjects.day0 <- unique(abt.2020.all[abt.2020.all$timepoint == 0, ]$subject_id)
+subjects.day14 <- unique(abt.2020.all[abt.2020.all$timepoint == 14, ]$subject_id)
+ids <- intersect(subjects.day0, subjects.day14)
+
+# Subset antibody titer
+abt.2020.subset <- abt.2020.all[abt.2020.all$subject_id %in% ids, ]
+abt.2020.day0 <- abt.2020.subset[abt.2020.subset$timepoint == 0, ]
+abt.2020.day14 <- abt.2020.subset[abt.2020.subset$timepoint == 14, ]
+
+```
+
+## Step 2: Transpose the CMI-PB 2020 TPM normalized expression data
+
+```{r pre-process gene data}
+
+# Tranpose the TPM normalized gene expression data
+ge.TPM.2020.day0.T <- ge.TPM.2020.day0 %>% 
+   tibble::column_to_rownames('subject_id') %>% 
+   t()
+
+```
+
+## Step 3: Load differential genomic signature at day 0 and gene expression with TPM normalization
+
+```{r}
+
+# Obtain the probe set IDs and gene symbol annotations from the original study
+df.genes.up <- read_excel("../khvi_a_1450122_sm5896.xlsx", range = "A5:F61",
+                          col_names = c("ProbeSetID", "Annotations", "RefSeq",
+                                        "Fold Change", "P-value", "locus_type"))
+df.genes.down <- read_excel("../khvi_a_1450122_sm5896.xlsx", range = "A66:F80",
+                            col_names = c("ProbeSetID", "Annotations", "RefSeq",
+                                        "Fold Change", "P-value", "locus_type"))
+
+# Remove ".1" from probe IDs
+probes.up <- substr(df.genes.up$ProbeSetID, 1, 
+                    nchar(df.genes.up$ProbeSetID)-2) 
+probes.down <- substr(df.genes.down$ProbeSetID, 1, 
+                      nchar(df.genes.down$ProbeSetID)-2) 
+probeIDs <- c(probes.up, probes.down)
+
+# Create probe ID to ensembl ID mapping for the genes differentially expressed genes
+ensembl.probe.map <- getBM(attributes=c('affy_hta_2_0', 
+                                        'ensembl_gene_id',
+                                        'external_gene_name'), 
+                           filters = 'with_affy_hta_2_0',
+                           values = TRUE,
+                           mart = ensembl) %>% 
+   filter(affy_hta_2_0 %in% probeIDs)
+
+# Identify the genes map onto the gene expression matrix using the ensembl IDs
+# and remove first duplicated probe IDs and thereafter duplicated ensembl IDs
+exp.matrix <- ge.TPM.2020.day0.T %>% 
+   as.data.frame() %>% 
+   rownames_to_column("ensembl_gene_id")
+
+gene.exp.matrix <- merge(exp.matrix, 
+                         ensembl.probe.map, by = "ensembl_gene_id") %>%
+   distinct(affy_hta_2_0, .keep_all = TRUE) %>% 
+   distinct(ensembl_gene_id, .keep_all = TRUE)
+
+# Extract the ensembl IDs
+ensembl.sig <- gene.exp.matrix$ensembl_gene_id
+ensembl.up <- gene.exp.matrix[gene.exp.matrix$affy_hta_2_0 
+                              %in% probes.up, ]$ensembl_gene_id
+ensembl.down <- gene.exp.matrix[gene.exp.matrix$affy_hta_2_0 
+                                %in% probes.down, ]$ensembl_gene_id
+
+```
+
+## Step 4: Evaluate the predictive power of the differential genomic signature
+
+```{r model evaluation}
+
+# Isotype-antigens which are considered the most important
+selected.iso.ag <- c("IgG-PT", "IgG-FHA",   "IgG-PRN", "IgG1-PT",
+                     "IgG1-FHA", "IgG4-PT", "IgG4-FHA")
+
+################ TPM normalized gene expression ###############
+# Calculate the gene set score with TPM normalized gene expression
+df.ensembl.sig.2020.pred.TPM <- geneSigCalc(gene.ex.data=ge.TPM.2020.day0.T,
+                                            score='missing', 
+                                            ensembl.sig=ensembl.sig,
+                                            genes.up=ensembl.up, 
+                                            genes.down=ensembl.down,
+                                            post.ab.data=abt.2020.day14,
+                                            pre.ab.data=abt.2020.day0,
+                                            filter.ab.ag=selected.iso.ag,
+                                            verbose=TRUE)
+
+# Evaluate gene signature with TPM normalized gene expression
+Qui.2018.gene.sig.2020.results.TPM <- evaluateModel(df.prediction=df.ensembl.sig.2020.pred.TPM,
+                                                    N.perm = 1000, direction="missing",
+                                                    add.to.title='- TPM normalized',
+                                                    score.label='Differential genomic signature score',
+                                                    fn1='ensemblSig_vs_day14_heatmap_TPM',
+                                                    fn2='ensemblSig_vs_day14_correlation_TPM ',
+                                                    fn3='ensemblSig_vs_FC_heatmap_TPM',
+                                                    fn4='ensemblSig_vs_FC_correlation_TPM ',
+                                                    fn5='ensemblSig_vs_day14_AUC_TPM',
+                                                    fn6='ensemblSig_vs_day14_boxplot_TPM',
+                                                    fn7='ensemblSig_vs_FC_AUC_TPM',
+                                                    fn8='ensemblSig_vs_FC_boxplot_TPM',
+                                                    path = 'Results/2020/TPM/EnsemblSig/')
+
+# Save results
+save(Qui.2018.gene.sig.2020.results.TPM, 
+     file = "Results/2020/TPM/EnsemblSig/Qui.2018.gene.sig.2020.results.TPM.RData")
+
+
+```
+
+## Step 5: Pre-process CMI-PB 2021 antibody titer data
+
+```{r}
+
+# Normalized antibody titer data by baseline median
+ab.titer.day0.2021.all <- ab.titer.2021.day0 %>% 
+   filter(antigen %in% c('PT', 'PRN', 'FHA', 'FIM2/3')) %>% 
+   unite(isotype_antigen, c("isotype", "antigen"), sep = "-") %>% 
+   inner_join(., specimen.table.2021 %>% dplyr::select(specimen_id, subject_id, 
+                                                  planned_day_relative_to_boost), 
+              by='specimen_id') %>% 
+   dplyr::rename(timepoint = planned_day_relative_to_boost) %>% 
+   tibble()
+
+ab.titer.subject.ids <- unique(ab.titer.day0.2021.all$subject_id)
+abt.2021.day0 <- ab.titer.day0.2021.all[ab.titer.day0.2021.all$timepoint == 0, ]
+abt.2021.day0 <- abt.2021.day0 %>% 
+   filter(isotype_antigen %in% selected.iso.ag)
+
+# Change format of the day 14 antibody titers
+abt.2021.day14 <- ab.titer.2021.day14 %>% 
+   separate(task, into=c("task", "antigen"), sep = "\\) ") %>% 
+   dplyr::mutate(isotype_antigen = recode(antigen, 
+                                          `Pertussis Toxin` = "IgG-PT", 
+                                          `FHA` = 'IgG-FHA', 
+                                          `Pertactin` =  'IgG-PRN',
+                                          `IgG1 - Pertussis toxin` = "IgG1-PT",
+                                          `IgG1 - FHA` = "IgG1-FHA",
+                                          `IgG4 - Pertussis toxin` = "IgG4-PT",
+                                          `IgG4 - FHA` = "IgG4-FHA"))
+
+```
+
+## Step 5: Transpose the CMI-PB 2021 TPM normalized expression data
+
+```{r pre-process gene data}
+
+# Subset gene expression data based on subjects with antibody titers
+ge.TPM.2021.day0 <- ge.TPM.2021.day0[ge.TPM.2021.day0$subject_id 
+                                     %in% ab.titer.subject.ids, ]
+
+# Tranpose the TPM normalized gene expression data
+ge.TPM.2021.day0.T <- ge.TPM.2021.day0 %>% 
+   tibble::column_to_rownames('subject_id') %>% 
+   t()
+
+```
+
+## Step 6: Make predictions for the CMI-PB 2021 data
+
+```{r}
+
+################ TPM normalized gene expression ###############
+# Calculate the gene set score with TPM normalized gene expression
+df.gene.sig.pred.2021 <- geneSigCalc(gene.ex.data=ge.TPM.2021.day0.T,
+                                     score='missing', 
+                                     ensembl.sig=ensembl.sig,
+                                     genes.up=ensembl.up, 
+                                     genes.down=ensembl.down,
+                                     verbose=TRUE)
+# Read submisson format
+submission.format <- fread("../../Data/2021_cmipb_challenge/2021_submission_format.tsv") %>% 
+   dplyr::rename(subject_id = Subject_ID)
+
+# HBV pre-vaccine transfer signature 2021 predictions
+Qui.2018.gene.sig.2021.pred <- submission.format %>% 
+   left_join(., df.gene.sig.pred.2021, by="subject_id")
+Qui.2018.gene.sig.2021.pred[, c(5:11)] <- Qui.2018.gene.sig.2021.pred$rank.predictor
+Qui.2018.gene.sig.2021.pred <- Qui.2018.gene.sig.2021.pred[,c(1:18)] %>% 
+   dplyr::rename(Subject_ID = subject_id)
+# Save predictions
+write.table(Qui.2018.gene.sig.2021.pred, 
+            file = "Results/2021_predictions/qui_2018_gene_sig_CMI-PB_2021.tsv",
+            quote=FALSE, sep='\t', row.names = FALSE)
+
+
+```
+
+## Step 7: Evaluate the differential genomic signature on the CMI-PB 2021 dataset
+
+```{r model evaluation}
+
+# Calculate the gene set score with TPM normalized gene expression
+df.gene.sig.2021.pred <- geneSigCalc(gene.ex.data=ge.TPM.2021.day0.T,
+                                     score='missing', 
+                                     ensembl.sig=ensembl.sig,
+                                     genes.up=ensembl.up, 
+                                     genes.down=ensembl.down,
+                                     post.ab.data=abt.2021.day14,
+                                     pre.ab.data=abt.2021.day0,
+                                     filter.ab.ag=selected.iso.ag,
+                                     verbose=TRUE)
+
+# Evaluate gene signature with TPM normalized gene expression
+Qui.2018.gene.sig.2021.results <- evaluateModel(df.prediction=df.gene.sig.2021.pred,
+                                                N.perm = 1000, direction="missing",
+                                                add.to.title='- TPM normalized',
+                                                score.label='Differential genomic signature score',
+                                                fn1='ensemblSig_vs_day14_heatmap',
+                                                fn2='ensemblSig_vs_day14_correlation',
+                                                fn3='ensemblSig_vs_FC_heatmap',
+                                                fn4='ensemblSig_vs_FC_correlation',
+                                                fn5='ensemblSig_vs_day14_AUC',
+                                                fn6='ensemblSig_vs_day14_boxplot',
+                                                fn7='ensemblSig_vs_FC_AUC',
+                                                fn8='ensemblSig_vs_FC_boxplot',
+                                                path = 'Results/2021/EnsemblSig/')
+
+# Save results
+save(Qui.2018.gene.sig.2021.results, 
+     file = "Results/2021/EnsemblSig/Qui.2018.gene.sig.2021.results.RData")
+```
+
