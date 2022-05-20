@@ -1,0 +1,313 @@
+---
+title: "Model 11 - An innate immune activation state prior to vaccination predicts responsiveness to multiple vaccines (DOI: https://doi.org/10.1101/2021.09.26.461847)"
+author: "Mikkel Niklas Rasmussen"
+date: "3/10/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### Applying the gene signature identified accross 13 vaccines presented in the study by Fourati et al. (DOI: https://doi.org/10.1101/2021.09.26.461847) on the CMI-PB dataset
+
+```{r load libaries, echo=FALSE}
+
+suppressMessages(library('data.table'))
+suppressMessages(library('dplyr'))
+suppressMessages(library('tidyr'))
+suppressMessages(library('Biobase'))
+suppressMessages(library('DESeq2'))
+suppressMessages(library('pROC'))
+suppressMessages(library("RCurl"))
+suppressMessages(library("readr"))
+suppressMessages(library("ggplot2"))
+suppressMessages(library("biomaRt"))
+suppressMessages(library("tibble"))
+suppressMessages(library("plyr"))
+suppressMessages(library("caret"))
+suppressMessages(library("limma"))
+suppressMessages(library("edgeR"))
+suppressMessages(library("preprocessCore"))
+
+# Load functions for evaluating gene signatures
+source('../../R/functions/geneModelEvaluate.R')
+
+```
+
+#### Load the CMI-PB datasets
+
+```{r load data}
+
+DATA_DIR <- "../../Data/Pre_process/cmi-pb-multiomics/results/main/cmi_pb_datasets/processed/full"
+
+# Info table (meta data)
+meta.2020 <- fread(file.path(DATA_DIR, "meta.2020.pivoted.tsv.gz"))
+meta.2021 <- fread(file.path(DATA_DIR, "meta.2021.pivoted.tsv.gz"))
+specimen.table.2020 <- fread("../../Data/2021_cmipb_challenge/2020LD_specimen.csv")
+specimen.table.2021 <- fread("../../Data/2021_cmipb_challenge/2021BD_specimen.csv")
+
+# Antibody titer data
+ab.titer.2020 <- fread("../../Data/2021_cmipb_challenge/2020LD_ab_titer.csv")
+ab.titer.2021.day0 <- fread("../../Data/2021_cmipb_challenge/2021BD_ab_titer.csv")
+ab.titer.2021.day14 <- fread("../../Data/2021_cmipb_challenge/2021_ab_titer_day14.csv")
+
+# Gene expression data for day 0
+ge.RAW.2020.day0 <- fread(file.path(DATA_DIR, "rnaseq_raw.2020.day0.pivoted.tsv.gz"))
+ge.RAW.2021.day0 <- fread(file.path(DATA_DIR, "rnaseq_raw.2021.day0.pivoted.tsv.gz"))
+
+```
+
+## Step 1: Preprocess CMI-PB antibody titer data
+
+```{r}
+
+#### Antibody titer data
+# Normalized antibody titer data by baseline median
+abt.2020.all <- ab.titer.2020 %>% 
+   filter(antigen %in% c('PT', 'PRN', 'FHA', 'FIM2/3')) %>% 
+   unite(isotype_antigen, c("isotype", "antigen"), sep = "-") %>% 
+   inner_join(., specimen.table.2020 %>% dplyr::select(specimen_id, subject_id, 
+                                                  planned_day_relative_to_boost), 
+              by='specimen_id') %>% 
+   filter(planned_day_relative_to_boost %in% c(0, 1, 3, 7, 14, 30)) %>% 
+   dplyr::rename(timepoint = planned_day_relative_to_boost) %>% 
+   tibble()
+
+# Select the subject that have data day 0 and 14
+subjects.day0 <- unique(abt.2020.all[abt.2020.all$timepoint == 0, ]$subject_id)
+subjects.day14 <- unique(abt.2020.all[abt.2020.all$timepoint == 14, ]$subject_id)
+ids <- intersect(subjects.day0, subjects.day14)
+
+# Subset antibody titer
+abt.2020.subset <- abt.2020.all[abt.2020.all$subject_id %in% ids, ]
+abt.2020.day0 <- abt.2020.subset[abt.2020.subset$timepoint == 0, ]
+abt.2020.day14 <- abt.2020.subset[abt.2020.subset$timepoint == 14, ]
+
+```
+
+## Step 2: CMI-PB 2020 read counts are transformed using the variance stabilizing transformation method from DESeq2
+
+```{r}
+
+# Tranpose the raw cout gene expression data
+ge.RAW.2020.day0.T <- ge.RAW.2020.day0 %>% 
+   tibble::column_to_rownames('subject_id') %>% 
+   t()
+
+# Subset antibody titers data
+meta.2020.day0 <- meta.2020[meta.2020$planned_day_relative_to_boost == 0, ]
+meta.2020.day0..mask <- meta.2020.day0$subject_id %in% colnames(ge.RAW.2020.day0.T)
+meta.2020.day0 <- meta.2020.day0[meta.2020.day0..mask, ]
+
+# Create DESeq dataset object
+dds <- DESeqDataSetFromMatrix(countData = ge.RAW.2020.day0.T,
+                              colData = meta.2020.day0,
+                              design = ~ 1)
+
+# DESeq2 normalization with variance stabilizing transformation (vst)
+cds <- estimateSizeFactors(dds) ## estimate size factor
+cdsBlind <- estimateDispersions(cds)
+vsd <- vst(cdsBlind, blind=TRUE)
+norm.exprs.2020 <- assay(vsd)
+
+```
+
+## Step 3: Performing cross-study quantile normalization to match the distribution of the original study
+
+```{r}
+
+# Load the normalized expression matrix from the original study
+eset.target <- readRDS("all_norm_eset.rds")
+
+# Create target distribution based on normalized version of selected features and samples
+target.dist <- preprocessCore::normalize.quantiles.determine.target(exprs(eset.target))
+
+# Normalize all features and samples based on subset target distribution
+normAllExprs.2020 <- preprocessCore::normalize.quantiles.use.target(norm.exprs.2020, 
+                                                               target = target.dist)
+
+# Restore ensembl IDs and subject IDs as row and colnames, respectively
+dimnames(normAllExprs.2020) <- dimnames(norm.exprs.2020)
+
+```
+
+## Step 4: Evaluate the random forest model with the top 500 varying genes
+
+```{r}
+
+# Load Random Forest classifier
+load(file='RandomForestFinalModel.rda')
+
+# Isotype-antigens which are considered the most important
+selected.iso.ag <- c("IgG-PT", "IgG-FHA",   "IgG-PRN", "IgG1-PT",
+                     "IgG1-FHA", "IgG4-PT", "IgG4-FHA")
+
+# Predict the class using the Random Forest model
+df.RF.2020.pred <- mlModelPredict(gene.ex.data=normAllExprs.2020,
+                                  study='fourati_2021', 
+                                  model=model_list, 
+                                  post.ab.data=abt.2020.day14, 
+                                  pre.ab.data=abt.2020.day0,
+                                  filter.ab.ag=selected.iso.ag)
+
+# Evaluate model predictions 
+Fourati.2021.RF.2020.results <- evaluateModel(df.prediction=df.RF.2020.pred, 
+                                              N.perm = 1000, direction="<",
+                                              score.label = 'Class probability',
+                                              fn1='RFpred_vs_day14_heatmap_DESEQ',
+                                              fn2='RFpred_vs_day14_correlation_DESEQ ',
+                                              fn3='RFpred_vs_FC_heatmap_DESEQ',
+                                              fn4='RFpred_vs_FC_correlation_DESEQ ',
+                                              fn5='RFpred_vs_day14_AUC_DESEQ',
+                                              fn6='RFpred_vs_day14_boxplot_DESEQ',
+                                              fn7='RFpred_vs_FC_AUC_DESEQ',
+                                              fn8='RFpred_vs_FC_boxplot_DESEQ',
+                                              path = 'Results/2020/DESEQ/RF_model/')
+
+# Save results
+save(Fourati.2021.RF.2020.results, 
+     file = "Results/2020/DESEQ/RF_model/Fourati.2021.RF.2020.results.RData")
+```
+
+## Step 5: Pre-process CMI-PB 2021 antibody titer data
+
+```{r}
+
+# Normalized antibody titer data by baseline median
+ab.titer.day0.2021.all <- ab.titer.2021.day0 %>% 
+   filter(antigen %in% c('PT', 'PRN', 'FHA', 'FIM2/3')) %>% 
+   unite(isotype_antigen, c("isotype", "antigen"), sep = "-") %>% 
+   inner_join(., specimen.table.2021 %>% dplyr::select(specimen_id, subject_id, 
+                                                  planned_day_relative_to_boost), 
+              by='specimen_id') %>% 
+   dplyr::rename(timepoint = planned_day_relative_to_boost) %>% 
+   tibble()
+
+ab.titer.subject.ids <- unique(ab.titer.day0.2021.all$subject_id)
+abt.2021.day0 <- ab.titer.day0.2021.all[ab.titer.day0.2021.all$timepoint == 0, ]
+abt.2021.day0 <- abt.2021.day0 %>% 
+   filter(isotype_antigen %in% selected.iso.ag)
+
+# Change format of the day 14 antibody titers
+abt.2021.day14 <- ab.titer.2021.day14 %>% 
+   separate(task, into=c("task", "antigen"), sep = "\\) ") %>% 
+   dplyr::mutate(isotype_antigen = recode(antigen, 
+                                          `Pertussis Toxin` = "IgG-PT", 
+                                          `FHA` = 'IgG-FHA', 
+                                          `Pertactin` =  'IgG-PRN',
+                                          `IgG1 - Pertussis toxin` = "IgG1-PT",
+                                          `IgG1 - FHA` = "IgG1-FHA",
+                                          `IgG4 - Pertussis toxin` = "IgG4-PT",
+                                          `IgG4 - FHA` = "IgG4-FHA"))
+
+```
+
+## Step 6: CMI-PB 2021 read counts are transformed using the variance stabilizing transformation method from DESeq2
+
+```{r}
+
+# Subset gene expression data based on subjects with antibody titers
+ge.RAW.2021.day0 <- ge.RAW.2021.day0[ge.RAW.2021.day0$subject_id 
+                                     %in% ab.titer.subject.ids, ]
+
+# Tranpose the raw cout gene expression data
+ge.RAW.2021.day0.T <- ge.RAW.2021.day0 %>% 
+   tibble::column_to_rownames('subject_id') %>% 
+   t()
+
+# Subset antibody titers data
+meta.2021.day0 <- meta.2021[meta.2021$planned_day_relative_to_boost == 0, ]
+meta.2021.day0..mask <- meta.2021.day0$subject_id %in% colnames(ge.RAW.2021.day0.T)
+meta.2021.day0 <- meta.2021.day0[meta.2021.day0..mask, ]
+
+# Create DESeq dataset object
+dds.2021 <- DESeqDataSetFromMatrix(countData = ge.RAW.2021.day0.T,
+                                   colData = meta.2021.day0,
+                                   design = ~ 1)
+
+# DESeq2 normalization with variance stabilizing transformation (vst)
+cds <- estimateSizeFactors(dds.2021) ## estimate size factor
+cdsBlind <- estimateDispersions(cds)
+vsd <- vst(cdsBlind, blind=TRUE)
+norm.exprs.2021 <- assay(vsd)
+
+```
+
+## Step 7: Performing cross-study quantile normalization to match the distribution of the original study
+
+```{r}
+
+# Load the normalized expression matrix from the original study
+eset.target <- readRDS("all_norm_eset.rds")
+
+# Create target distribution based on normalized version of selected features and samples
+target.dist <- preprocessCore::normalize.quantiles.determine.target(exprs(eset.target))
+
+# Normalize all features and samples based on subset target distribution
+normAllExprs.2021 <- preprocessCore::normalize.quantiles.use.target(norm.exprs.2021, 
+                                                                    target = target.dist)
+
+# Restore ensembl IDs and subject IDs as row and colnames, respectively
+dimnames(normAllExprs.2021) <- dimnames(norm.exprs.2021)
+
+```
+
+## Step 8: Make prediction for the CMI-PB 2021 data
+
+```{r}
+
+# Predict the class using the Random Forest model
+df.RF.pred.2021 <- mlModelPredict(gene.ex.data=normAllExprs.2021,
+                                  study='fourati_2021', 
+                                  model=model_list)
+
+# Read submisson format
+submission.format <- fread("../../Data/2021_cmipb_challenge/2021_submission_format.tsv") %>% 
+   dplyr::rename(subject_id = Subject_ID)
+
+# HBV pre-vaccine transfer signature 2021 predictions
+Fourati.2021.RF.2021.pred <- submission.format %>% 
+   left_join(., df.RF.pred.2021, by="subject_id")
+Fourati.2021.RF.2021.pred[, c(5:11)] <- Fourati.2021.RF.2021.pred$rank.predictor
+Fourati.2021.RF.2021.pred <- Fourati.2021.RF.2021.pred[,c(1:18)] %>% 
+   dplyr::rename(Subject_ID = subject_id)
+# Save predictions
+write.table(Fourati.2021.RF.2021.pred, 
+            file = "Results/2021_predictions/fourati_2021_RF_CMI-PB_2021.tsv",
+            quote=FALSE, sep='\t', row.names = FALSE)
+
+
+```
+
+## Step 9: Evaluate the DLDA model using different number of cell populations on the CMI-PB 2021 dataset
+
+```{r model evaluation}
+
+# Predict the class using the Random Forest model
+df.RF.2021.pred <- mlModelPredict(gene.ex.data=normAllExprs.2021,
+                                  study='fourati_2021', 
+                                  model=model_list, 
+                                  post.ab.data=abt.2021.day14, 
+                                  pre.ab.data=abt.2021.day0,
+                                  filter.ab.ag=selected.iso.ag)
+
+# Evaluate model predictions 
+Fourati.2021.RF.2021.results <- evaluateModel(df.prediction=df.RF.2021.pred, 
+                                              N.perm = 1000, direction="<",
+                                              score.label = 'Class probability',
+                                              fn1='RFpred_vs_day14_heatmap_DESEQ',
+                                              fn2='RFpred_vs_day14_correlation_DESEQ ',
+                                              fn3='RFpred_vs_FC_heatmap_DESEQ',
+                                              fn4='RFpred_vs_FC_correlation_DESEQ ',
+                                              fn5='RFpred_vs_day14_AUC_DESEQ',
+                                              fn6='RFpred_vs_day14_boxplot_DESEQ',
+                                              fn7='RFpred_vs_FC_AUC_DESEQ',
+                                              fn8='RFpred_vs_FC_boxplot_DESEQ',
+                                              path = 'Results/2021/RF_model/')
+
+# Save results
+save(Fourati.2021.RF.2021.results, 
+     file = "Results/2021/RF_model/Fourati.2021.RF.2021.results.RData")
+
+```
