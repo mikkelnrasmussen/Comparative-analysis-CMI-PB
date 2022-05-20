@@ -1,5 +1,5 @@
 ---
-title: "Model 11 - An innate immune activation state prior to vaccination predicts responsiveness to multiple vaccines (DOI: https://doi.org/10.1101/2021.09.26.461847)"
+title: "Study 7 - An innate immune activation state prior to vaccination predicts responsiveness to multiple vaccines (DOI: https://doi.org/10.1101/2021.09.26.461847)"
 author: "Mikkel Niklas Rasmussen"
 date: "3/10/2022"
 output: html_document
