@@ -33,7 +33,7 @@ suppressMessages(library("readxl"))
 
 # Load functions for evaluating gene signatures
 source('../R/modelEvaluate.R')
-source("../dlda/internals.r")
+source("internals.r")
 
 ```
 
@@ -161,24 +161,22 @@ for(cell.pop in cell.pop.map[cell.pop.map$`Population ID` %in% top5, ]$`Subset n
    print(cell.pop)
 }
 
+
 # Effector memory CD4+ T cells - gating definitions:
 print("Original study - gating definition: ")
 cell.pop.map[cell.pop.map$`Population ID` %in% top5, ]$Markers[1]
-
 print("Closest cell population in CMI-PB 2020 dataset - gatinge definition:")
 cell.types.2020[cell.types.2020$cell_type_name == 'TemCD4', ]$gating_definition
 
 # Central memory T helper cells - gating definitions: 
 print("Original study - gating definition: ")
 cell.pop.map[cell.pop.map$`Population ID` %in% top5, ]$Markers[2]
-
 print("Closest cell population in CMI-PB 2020 dataset - gatinge definition:")
 cell.types.2020[cell.types.2020$cell_type_name == "TcmCD4", ]$gating_definition
 
 # T cytotoxic CD8+ CD27+ (closest in CMI-PB is CD8Tcells) - gating definitions:
 print("Original study - gating definition: ")
 cell.pop.map[cell.pop.map$`Population ID` %in% top5, ]$Markers[3]
-
 print("Closest cell population in CMI-PB 2020 dataset - gatinge definition:")
 cell.types.2020[cell.types.2020$cell_type_name == "CD8Tcells", ]$gating_definition
 
@@ -186,16 +184,16 @@ cell.types.2020[cell.types.2020$cell_type_name == "CD8Tcells", ]$gating_definiti
 print("Original study - gating definition: ")
 cell.pop.map[cell.pop.map$`Population ID` %in% top5, ]$Markers[4] 
 print("Closest cell population in CMI-PB 2020 dataset - gatinge definition:")
-cell.types.2020[cell.types.2020$cell_type_name == 'ASCs (Plasmablasts)', ]$gating_definition
+cell.types.2020[cell.types.2020$cell_type_name == 'Bcells', ]$gating_definition
 
 # Memory B cells IgD+ CD38+
 print("Original study - gating definition: ")
 cell.pop.map[cell.pop.map$`Population ID` %in% top5, ]$Markers[5]
 print("Closest cell population in CMI-PB 2020 dataset - gatinge definition:")
-cell.types.2020[cell.types.2020$cell_type_name == "Bcells", ]$gating_definition
+cell.types.2020[cell.types.2020$cell_type_name == "ASCs (Plasmablasts)", ]$gating_definition
 
 # The selected cell populations closest to the top 5 in the CMI-PB dataset
-populations.top5.2020 <- c("TemCD4", "TcmCD4", "CD8Tcells", "Bcells", 'ASCs (Plasmablasts)')
+populations.top5.2020 <- c("TemCD4", 'ASCs (Plasmablasts)', "TcmCD4", "CD8Tcells", "Bcells")
 
 
 ```
@@ -204,7 +202,7 @@ populations.top5.2020 <- c("TemCD4", "TcmCD4", "CD8Tcells", "Bcells", 'ASCs (Pla
 
 ```{r model evaluation}
 
-DLDA.models <- readRDS("../dlda/DLDA_models.rds")
+DLDA.models <- readRDS("DLDA_models.rds")
 
 # Isotype-antigens which are considered the most important
 selected.iso.ag <- c("IgG-PT", "IgG-FHA",   "IgG-PRN", "IgG1-PT",
@@ -212,27 +210,27 @@ selected.iso.ag <- c("IgG-PT", "IgG-FHA",   "IgG-PRN", "IgG1-PT",
 
 # Calculate the class probabilities for the DLDA model using 2 cell populations
 df.DLDA.top2.2020.pred <- mlModelPredict(cytof.data=cytof.2020.day0,
-                                    populations=populations.top2.2020,
-                                    study='Tsang_2014', 
-                                    model=DLDA.models[[1]],
-                                    filter.ab.ag=selected.iso.ag,
-                                    post.ab.data=abt.2020.day14,
-                                    pre.ab.data=abt.2020.day0)
+                                         populations=populations.top2.2020,
+                                         study='Tsang_2014', 
+                                         model=DLDA.models[[1]],
+                                         filter.ab.ag=selected.iso.ag,
+                                         post.ab.data=abt.2020.day14,
+                                         pre.ab.data=abt.2020.day0)
 
 # Evaluate DLDA model with 2 cell populations
 Tsang.2014.DLDA.top2.2020.results <- evaluateModel(df.prediction=df.DLDA.top2.2020.pred, 
-                                              direction = 'missing', N.perm = 1000,
-                                              score.label='Class probability',
-                                              add.to.title = " -  DLDA model with 2 cell populations",
-                                              fn1='DLDApred_vs_day14_heatmap',
-                                              fn2='DLDApred_vs_day14_correlation',
-                                              fn3='DLDApred_vs_FC_heatmap',
-                                              fn4='DLDApred_vs_FC_correlation',
-                                              fn5='DLDApred_vs_day14_AUC',
-                                              fn6='DLDApred_vs_day14_boxplot',
-                                              fn7='DLDApred_vs_FC_AUC',
-                                              fn8='DLDApred_vs_FC_boxplot',
-                                              path = 'Results/2020/DLDA_top2/')
+                                                   direction = 'missing', N.perm = 10000,
+                                                   score.label='Class probability',
+                                                   add.to.title = " -  DLDA model with 2 cell populations",
+                                                   fn1='DLDApred_vs_day14_heatmap',
+                                                   fn2='DLDApred_vs_day14_correlation',
+                                                   fn3='DLDApred_vs_FC_heatmap',
+                                                   fn4='DLDApred_vs_FC_correlation',
+                                                   fn5='DLDApred_vs_day14_AUC',
+                                                   fn6='DLDApred_vs_day14_boxplot',
+                                                   fn7='DLDApred_vs_FC_AUC',
+                                                   fn8='DLDApred_vs_FC_boxplot',
+                                                   path = 'Results/2020/DLDA_top2/')
 
 save(Tsang.2014.DLDA.top2.2020.results, 
      file = "Results/2020/DLDA_top2/Tsang.2014.DLDA.top2.2020.results.RData")
@@ -250,7 +248,7 @@ df.DLDA.top5.2020.pred <- mlModelPredict(cytof.data=cytof.2020.day0,
 
 # Evaluate DLDA model with 5 cell populations
 Tsang.2014.DLDA.top5.2020.results <- evaluateModel(df.prediction=df.DLDA.top5.2020.pred, 
-                                                   direction = 'missing', N.perm = 1000,
+                                                   direction = 'missing', N.perm = 10000,
                                                    score.label='Class probability',
                                                    add.to.title = " -  DLDA model with 5 cell populations",
                                                    fn1='DLDApred_vs_day14_heatmap',
@@ -369,39 +367,35 @@ for(cell.pop in cell.pop.map[cell.pop.map$`Population ID` %in% top5, ]$`Subset n
 # Effector memory CD4+ T cells - gating definitions:
 print("Original study - gating definition: ")
 cell.pop.map[cell.pop.map$`Population ID` %in% top5, ]$Markers[1]
-
 print("Closest cell population in CMI-PB 2020 dataset - gatinge definition:")
 cell.types.2021[cell.types.2021$cell_type_name == 'TemCD4', ]$gating_definition
 
 # Central memory T helper cells - gating definitions: 
 print("Original study - gating definition: ")
 cell.pop.map[cell.pop.map$`Population ID` %in% top5, ]$Markers[2]
-
 print("Closest cell population in CMI-PB 2020 dataset - gatinge definition:")
 cell.types.2021[cell.types.2021$cell_type_name == "TcmCD4", ]$gating_definition
 
 # T cytotoxic CD8+ CD27+ (closest in CMI-PB is CD8Tcells) - gating definitions:
 print("Original study - gating definition: ")
 cell.pop.map[cell.pop.map$`Population ID` %in% top5, ]$Markers[3]
-
 print("Closest cell population in CMI-PB 2020 dataset - gatinge definition:")
 cell.types.2021[cell.types.2021$cell_type_name == "CD8Tcells", ]$gating_definition
 
 # Memory B cells IgD- CD38+ - gating definitions:
 print("Original study - gating definition: ")
 cell.pop.map[cell.pop.map$`Population ID` %in% top5, ]$Markers[4] 
-
 print("Closest cell population in CMI-PB 2020 dataset - gatinge definition:")
 cell.types.2021[cell.types.2021$cell_type_name == 'Memory B cells', ]$gating_definition
 
 # Memory B cells IgD+ CD38+ - gating definitions:
+print("Original study - gating definition: ")
 cell.pop.map[cell.pop.map$`Population ID` %in% top5, ]$Markers[5]
-
 print("Closest cell population in CMI-PB 2020 dataset - gatinge definition:")
 cell.types.2021[cell.types.2021$cell_type_name == 'Naive B cells', ]$gating_definition
 
 # The selected cell populations closest to the top 5 in the CMI-PB dataset
-populations.top5.2021 <- c("TemCD4", "TcmCD4", "CD8Tcells", 'Memory B cells', 'Naive B cells')
+populations.top5.2021 <- c("TemCD4", 'Naive B cells', "TcmCD4", "CD8Tcells", 'Memory B cells')
 
 ```
 
@@ -410,7 +404,7 @@ Step 8: Make prediction for CMI-PB 2021 dataset
 ```{r}
 
 # Calculate the class probabilities for the DLDA model using 2 cell populations
-df.DLDA.top2.2021.pred <- mlModelPredict(cytof.data=cytof.2021.day0,
+df.DLDA.top2.pred.2021 <- mlModelPredict(cytof.data=cytof.2021.day0,
                                          populations=populations.top2.2021,
                                          study='Tsang_2014', 
                                          model=DLDA.models[[1]])
@@ -423,7 +417,7 @@ df.DLDA.top5.2021.pred <- mlModelPredict(cytof.data=cytof.2021.day0,
 
 
 # Read submisson format
-submission.format <- fread("../../Data/2021_cmipb_challenge/2021_submission_format.tsv") %>% 
+submission.format <- fread("../Data/2021_submission_format.tsv") %>% 
    dplyr::rename(subject_id = Subject_ID)
 
 # DLDA model using 2 cell populations
@@ -464,7 +458,7 @@ df.DLDA.top2.2021.pred <- mlModelPredict(cytof.data=cytof.2021.day0,
 
 # Evaluate DLDA model with 2 cell populations
 Tsang.2014.DLDA.top2.2021.results <- evaluateModel(df.prediction=df.DLDA.top2.2021.pred, 
-                                                   direction = 'missing', N.perm = 1000,
+                                                   direction = 'missing', N.perm = 10000,
                                                    score.label='Class probability',
                                                    add.to.title = " -  DLDA model with 2 cell populations",
                                                    fn1='DLDApred_vs_day14_heatmap',
@@ -475,10 +469,10 @@ Tsang.2014.DLDA.top2.2021.results <- evaluateModel(df.prediction=df.DLDA.top2.20
                                                    fn6='DLDApred_vs_day14_boxplot',
                                                    fn7='DLDApred_vs_FC_AUC',
                                                    fn8='DLDApred_vs_FC_boxplot',
-                                                   path = 'Results/2021/DLDA_top2_2021_populations/')
+                                                   path = 'Results/2021/DLDA_top2/')
 
 save(Tsang.2014.DLDA.top2.2021.results, 
-     file = "Results/2021/DLDA_top2_2021_populations/Tsang.2014.DLDA.top2.2021.results.RData")
+     file = "Results/2021/DLDA_top2/Tsang.2014.DLDA.top2.2021.results.RData")
 
 
 # Calculate the class probabilities for the DLDA model using 5 cell populations
@@ -493,7 +487,7 @@ df.DLDA.top5.2021.pred <- mlModelPredict(cytof.data=cytof.2021.day0,
 
 # Evaluate DLDA model with 5 cell populations
 Tsang.2014.DLDA.top5.2021.results <- evaluateModel(df.prediction=df.DLDA.top5.2021.pred, 
-                                                   direction = 'missing', N.perm = 1000,
+                                                   direction = 'missing', N.perm = 10000,
                                                    score.label='Class probability',
                                                    add.to.title = " -  DLDA model with 5 cell populations",
                                                    fn1='DLDApred_vs_day14_heatmap',
@@ -504,71 +498,9 @@ Tsang.2014.DLDA.top5.2021.results <- evaluateModel(df.prediction=df.DLDA.top5.20
                                                    fn6='DLDApred_vs_day14_boxplot',
                                                    fn7='DLDApred_vs_FC_AUC',
                                                    fn8='DLDApred_vs_FC_boxplot',
-                                                   path = 'Results/2021/DLDA_top5_2021_populations/')
+                                                   path = 'Results/2021/DLDA_top5/')
 
 save(Tsang.2014.DLDA.top5.2021.results, 
-     file = "Results/2021/DLDA_top5_2021_populations/Tsang.2014.DLDA.top5.2021.results.RData")
-
-```
-
-## Step 9: Evaluate the DLDA model using different number of cell populations on the CMI-PB 2021 dataset
-
-```{r model evaluation}
-
-# Calculate the class probabilities for the DLDA model using 2 cell populations
-df.DLDA.top2.2021.pred <- mlModelPredict(cytof.data=cytof.2021.day0,
-                                         populations=populations.top2.2020,
-                                         study='Tsang_2014', 
-                                         model=DLDA.models[[1]],
-                                         filter.ab.ag=selected.iso.ag,
-                                         post.ab.data=abt.2021.day14,
-                                         pre.ab.data=abt.2021.day0)
-
-# Evaluate DLDA model with 2 cell populations
-Tsang.2014.DLDA.top2.2021.results <- evaluateModel(df.prediction=df.DLDA.top2.2021.pred, 
-                                                   direction = 'missing', N.perm = 1000,
-                                                   score.label='Class probability',
-                                                   add.to.title = " -  DLDA model with 2 cell populations",
-                                                   fn1='DLDApred_vs_day14_heatmap',
-                                                   fn2='DLDApred_vs_day14_correlation',
-                                                   fn3='DLDApred_vs_FC_heatmap',
-                                                   fn4='DLDApred_vs_FC_correlation',
-                                                   fn5='DLDApred_vs_day14_AUC',
-                                                   fn6='DLDApred_vs_day14_boxplot',
-                                                   fn7='DLDApred_vs_FC_AUC',
-                                                   fn8='DLDApred_vs_FC_boxplot',
-                                                   path = 'Results/2021/DLDA_top2_2020_populations/')
-
-save(Tsang.2014.DLDA.top2.2021.results, 
-     file = "Results/2021/DLDA_top2_2020_populations/Tsang.2014.DLDA.top2.2021.results.RData")
-
-
-# Calculate the class probabilities for the DLDA model using 5 cell populations
-df.DLDA.top5.2021.pred <- mlModelPredict(cytof.data=cytof.2021.day0,
-                                         populations=populations.top5.2020,
-                                         study='Tsang_2014', 
-                                         model=DLDA.models[[2]],
-                                         filter.ab.ag=selected.iso.ag,
-                                         post.ab.data=abt.2021.day14,
-                                         pre.ab.data=abt.2021.day0)
-
-
-# Evaluate DLDA model with 5 cell populations
-Tsang.2014.DLDA.top5.2021.results <- evaluateModel(df.prediction=df.DLDA.top5.2021.pred, 
-                                                   direction = 'missing', N.perm = 1000,
-                                                   score.label='Class probability',
-                                                   add.to.title = " -  DLDA model with 5 cell populations",
-                                                   fn1='DLDApred_vs_day14_heatmap',
-                                                   fn2='DLDApred_vs_day14_correlation',
-                                                   fn3='DLDApred_vs_FC_heatmap',
-                                                   fn4='DLDApred_vs_FC_correlation',
-                                                   fn5='DLDApred_vs_day14_AUC',
-                                                   fn6='DLDApred_vs_day14_boxplot',
-                                                   fn7='DLDApred_vs_FC_AUC',
-                                                   fn8='DLDApred_vs_FC_boxplot',
-                                                   path = 'Results/2021/DLDA_top5_2020_populations/')
-
-save(Tsang.2014.DLDA.top5.2021.results, 
-     file = "Results/2021/DLDA_top5_2020_populations/Tsang.2014.DLDA.top5.2021.results.RData")
+     file = "Results/2021/DLDA_top5/Tsang.2014.DLDA.top5.2021.results.RData")
 
 ```
