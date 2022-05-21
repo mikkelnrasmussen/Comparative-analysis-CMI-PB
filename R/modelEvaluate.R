@@ -673,7 +673,7 @@ geneModuleCalc <- function(gene.ex.data, score, post.ab.data=NULL,
 
     if(score == 'qusage'){
        # Load gene modules
-       load('../ImmuneSignatures/data/geneSetDB.rda', envir = .GlobalEnv)
+       load('../Study-1-Avey-20117/geneSetDB.rda', envir = .GlobalEnv)
 
        # Prep GeneSetDB per original code.  Can also use GSEAbase package.
        # Convert from vector of strings to a list
