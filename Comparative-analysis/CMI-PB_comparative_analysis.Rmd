@@ -1,0 +1,894 @@
+---
+title: "CMI-PB - Comparative analysis of prediction models"
+author: "Mikkel Niklas Rasmussen"
+date: "4/29/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+suppressMessages(library('dplyr'))
+suppressMessages(library('tidyr'))
+suppressMessages(library("ggplot2"))
+suppressMessages(library('tibble'))
+suppressMessages(library("corrplot"))
+suppressMessages(library("ggrepel"))
+
+```
+
+
+## Load results from all of the prediction methods evaluate on the CMI-PB 2020 dataset
+
+```{r}
+
+############  2020 results ############ 
+# Study 1 - Avey et al. 2017
+load("../Study_1-Avey/CMI-PB/Results/2020/Gene_signature/DESEQ/Avey.2017.gene.sig.2020.results.RData")
+load("../Study_1-Avey/CMI-PB/Results/2020/Gene_modules/DESEQ/M54/Avey.2017.module.M54.2020.results.RData")
+load("../Study_1-Avey/CMI-PB/Results/2020/Gene_modules/DESEQ/M42/Avey.2017.module.M42.2020.results.RData")
+load("../Study_1-Avey/CMI-PB/Results/2020/Gene_modules/DESEQ/M33/Avey.2017.module.M33.2020.results.RData")
+
+# Study 2 - Tsang et al. 2015
+load("../Study_2-Tsang/CMI-PB/Results/2020/DLDA_top2/Tsang.2014.DLDA.top2.2020.results.RData")
+load("../Study_2-Tsang/CMI-PB/Results/2020/DLDA_top5/Tsang.2014.DLDA.top5.2020.results.RData")
+
+# Study 3 - Tsang et al. 2015
+load("../Study_3-Kotliarov/CMI-PB/Results/2020/DESEQ/TGSig/Kotliarov.2020.TGSig.2020.results.DESEQ.RData")
+load("../Study_3-Kotliarov/CMI-PB/Results/2020/DESEQ/SLE-Sig/Kotliarov.2020.SLE.Sig.2020.results.DESEQ.RData")
+load("../Study_3-Kotliarov/CMI-PB/Results/2020/DESEQ/IFN-I-DCact/Kotliarov.2020.IFN.I.DCact.2020.results.DESEQ.RData")
+
+# Study 4 - Fourati et al. 2015
+load("../Study_4-Fourati_Pre-vac/CMI-PB/Results/2020/DESEQ/BioAge/Fourati.2015.BioAge.2020.results.DESEQ.RData")
+load("../Study_4-Fourati_Pre-vac/CMI-PB/Results/2020/DESEQ/M1/Fourati.2015.M1.2020.results.DESEQ.RData")
+load("../Study_4-Fourati_Pre-vac/CMI-PB/Results/2020/DESEQ/M1+M16/Fourati.2015.M1.M16.2020.results.DESEQ.RData")
+load("../Study_4-Fourati_Pre-vac/CMI-PB/Results/2020/DESEQ/Naive_bayes/Fourati.2015.NB.2020.results.DESEQ.RData")
+load("../Study_4-Fourati_Pre-vac/CMI-PB/Results/2020/LR/Fourati.2015.LR.2020.results.RData")
+
+# Study 5 - Furman et al. 2013
+load("../Study_5-Furman/CMI-PB/Results/2020/Age/Furman.2013.Age.2020.results.RData")
+
+# Study 6 - Iulio et al. 2021
+load("../Study_7-Iolio/CMI-PB/Results/2020/HBV pre-vaccine/Iulio.2021.HBV.transfer.sig.2020.results.RData")
+load("../Study_7-Iolio/CMI-PB/Results/2020/Influenza pre-vaccine F/Iulio.2021.Inf.F.transfer.sig.2020.results.RData")
+load("../Study_7-Iolio/CMI-PB/Results/2020/Influenza pre-vaccine M/Iulio.2021.Inf.M.transfer.sig.2020.results.RData")
+load("../Study_7-Iolio/CMI-PB/Results/2020/TB pre-vaccine/Iulio.2021.TB.transfer.sig.2020.results.RData")
+
+# Study 7 - Fourati et al. 2021
+load("../Study_11-Fourati_Multi_vac/CMI-PB/Results/2020/DESEQ/RF_model/Fourati.2021.RF.2020.results.RData")
+
+# Study 8 - Bartholomeus et al. 2018
+load("../Study_12_Bartholomeus/CMI-PB/Results/2020/Gene_signature/Bartholomeus.2018.gene.sig.2020.results.RData")
+load("../Study_12_Bartholomeus/CMI-PB/Results/2020/Naive_bayes/Bartholomeus.2018.NB.2020.results.RData")
+
+# Study 9 - Qui et al. 2018 
+load("../Study_13-Qiu/CMI-PB/Results/2020/TPM/EnsemblSig/Qui.2018.gene.sig.2020.results.TPM.RData")
+
+# Study 10 - Franco et al. 2013
+load("../Study_14-Franco/CMI-PB/Results/2020/TPM/GeneSig/Franco.2013.gene.sig.2020.results.TPM.RData")
+
+# Combine all results
+df.2020.combined <- list(Avey.2017.gene.sig = Avey.2017.gene.sig.2020.results, # Influenza
+                         Avey.2017.M54 = Avey.2017.module.M54.2020.results, # Influenza
+                         Avey.2017.M42 = Avey.2017.module.M42.2020.results, # Influenza
+                         Avey.2017.M33 = Avey.2017.module.M33.2020.results, # Influenza
+                         Tsang.2015.DLDA.top2 = Tsang.2014.DLDA.top2.2020.results, # Influenza
+                         Tsang.2015.DLDA.top5 = Tsang.2014.DLDA.top5.2020.results, # Influenza
+                         Kotliarov.2020.TGSig = Kotliarov.2020.TGSig.2020.results.DESEQ, # Influenza
+                         Kotliarov.2020.SLE.Sig = Kotliarov.2020.SLE.Sig.2020.results.DESEQ, # Influenza
+                         Kotliarov.2020.IFN.I.DCact = Kotliarov.2020.IFN.I.DCact.2020.results.DESEQ, # Influenza
+                         Fourati.2015.BioAge = Fourati.2015.BioAge.2020.results.DESEQ, # HBV
+                         Fourati.2015.M1 = Fourati.2015.M1.2020.results.DESEQ, # HBV
+                         Fourati.2015.M1.M16 = Fourati.2015.M1.M16.2020.results.DESEQ, # HBV
+                         Fourati.2015.NB = Fourati.2015.NB.2020.results.DESEQ, # HBV
+                         Fourati.2015.LR = Fourati.2015.LR.2020.results, # HBV
+                         Furman.2013.Age = Furman.2013.Age.2020.results, 
+                         Iulio.2021.HBV = Iulio.2021.HBV.transfer.sig.2020.results, # HBV
+                         Iulio.2021.Influenza.F = Iulio.2021.Inf.F.transfer.sig.2020.results, # Influenza
+                         Iulio.2021.Influenza.M = Iulio.2021.Inf.M.transfer.sig.2020.results, # Influenza
+                         Iulio.2021.TB = Iulio.2021.TB.transfer.sig.2020.results, # TB (marques)
+                         Fourati.2021.RF = Fourati.2021.RF.2020.results, # Multiple vaccines
+                         Bartholomeus.2018.gene.sig = Bartholomeus.2018.gene.sig.2020.results, # HBV
+                         Bartholomeus.2018.NB = Bartholomeus.2018.NB.2020.results, # HBV
+                         Qui.2018.gene.sig = Qui.2018.gene.sig.2020.results.TPM, # HBV
+                         Franco.2013.gene.sig = Franco.2013.gene.sig.2020.results.TPM) # Influenza
+
+
+```
+
+## Load results from all of the prediction methods evaluate on the CMI-PB 2021 dataset
+
+```{r}
+
+############  2021 results ############ 
+# Study 1 - Avey et al. 2017
+load("../Study_1-Avey/CMI-PB/Results/2021/Gene_signature/Avey.2017.gene.sig.2021.results.RData")
+load("../Study_1-Avey/CMI-PB/Results/2021/Gene_modules/M54/Avey.2017.module.M54.2021.results.RData")
+load("../Study_1-Avey/CMI-PB/Results/2021/Gene_modules/M42/Avey.2017.module.M42.2021.results.RData")
+load("../Study_1-Avey/CMI-PB/Results/2021/Gene_modules/M33/Avey.2017.module.M33.2021.results.RData")
+
+# Study 2 - Tsang et al. 2015
+load("../Study_2-Tsang/CMI-PB/Results/2021/DLDA_top2_2021_populations//Tsang.2014.DLDA.top2.2021.results.RData")
+load("../Study_2-Tsang/CMI-PB/Results/2021/DLDA_top5_2021_populations//Tsang.2014.DLDA.top5.2021.results.RData")
+
+# Study 3 - Tsang et al. 2015
+load("../Study_3-Kotliarov/CMI-PB/Results/2021/TGSig/Kotliarov.2020.TGSig.2021.results.RData")
+load("../Study_3-Kotliarov/CMI-PB/Results/2021/SLE-Sig/Kotliarov.2020.SLE.Sig.2021.results.RData")
+load("../Study_3-Kotliarov/CMI-PB/Results/2021/IFN-I-DCact/Kotliarov.2020.IFN.I.DCact.2021.results.RData")
+
+# Study 4 - Fourati et al. 2015
+load("../Study_4-Fourati_Pre-vac/CMI-PB/Results/2021/BioAge/Fourati.2015.BioAge.2021.results.RData")
+load("../Study_4-Fourati_Pre-vac/CMI-PB/Results/2021/M1/Fourati.2015.M1.2021.results.RData")
+load("../Study_4-Fourati_Pre-vac/CMI-PB/Results/2021/M1+M16/Fourati.2015.M1.M16.2021.results.RData")
+load("../Study_4-Fourati_Pre-vac/CMI-PB/Results/2021/Naive_bayes/Fourati.2015.NB.2021.results.RData")
+load("../Study_4-Fourati_Pre-vac/CMI-PB/Results/2021/LR/Fourati.2015.LR.2021.results.RData")
+
+# Study 5 - Furman et al. 2013
+load("../Study_5-Furman/CMI-PB/Results/2021/Age/Furman.2013.Age.2021.results.RData")
+
+# Study 6 - Iulio et al. 2021
+load("../Study_7-Iolio/CMI-PB/Results/2021/HBV pre-vaccine/Iulio.2021.HBV.transfer.sig.2021.results.RData")
+load("../Study_7-Iolio/CMI-PB/Results/2021/Influenza pre-vaccine F/Iulio.2021.Inf.F.transfer.sig.2021.results.RData")
+load("../Study_7-Iolio/CMI-PB/Results/2021/Influenza pre-vaccine M/Iulio.2021.Inf.M.transfer.sig.2021.results.RData")
+load("../Study_7-Iolio/CMI-PB/Results/2021/TB pre-vaccine/Iulio.2021.TB.transfer.sig.2021.results.RData")
+
+# Study 7 - Fourati et al. 2021
+load("../Study_11-Fourati_Multi_vac/CMI-PB/Results/2021/RF_model/Fourati.2021.RF.2021.results.RData")
+
+# Study 8 - Bartholomeus et al. 2018
+load("../Study_12_Bartholomeus/CMI-PB/Results/2021/Gene_signature/Bartholomeus.2018.gene.sig.2021.results.RData")
+load("../Study_12_Bartholomeus/CMI-PB/Results/2021/Naive_bayes/Bartholomeus.2018.NB.2021.results.RData")
+
+# Study 9 - Qui et al. 2018 
+load("../Study_13-Qiu/CMI-PB/Results/2021/EnsemblSig/Qui.2018.gene.sig.2021.results.RData")
+
+# Study 10 - Franco et al. 2013
+load("../Study_14-Franco/CMI-PB/Results/2021/GeneSig/Franco.2013.gene.sig.2021.results.RData")
+
+# Combine all results
+df.2021.combined <- list(Avey.2017.gene.sig = Avey.2017.gene.sig.2021.results, # Influenza
+                         Avey.2017.M54 = Avey.2017.module.M54.2021.results, # Influenza
+                         Avey.2017.M42 = Avey.2017.module.M42.2021.results, # Influenza
+                         Avey.2017.M33 = Avey.2017.module.M33.2021.results, # Influenza
+                         Tsang.2015.DLDA.top2 = Tsang.2014.DLDA.top2.2021.results, # Influenza
+                         Tsang.2015.DLDA.top5 = Tsang.2014.DLDA.top5.2021.results, # Influenza
+                         Kotliarov.2020.TGSig = Kotliarov.2020.TGSig.2021.results, # Influenza
+                         Kotliarov.2020.SLE.Sig = Kotliarov.2020.SLE.Sig.2021.results, # Influenza
+                         Kotliarov.2020.IFN.I.DCact = Kotliarov.2020.IFN.I.DCact.2021.results, # Influenza
+                         Fourati.2015.BioAge = Fourati.2015.BioAge.2021.results, # HBV
+                         Fourati.2015.M1 = Fourati.2015.M1.2021.results, # HBV
+                         Fourati.2015.M1.M16 = Fourati.2015.M1.M16.2021.results, # HBV
+                         Fourati.2015.NB = Fourati.2015.NB.2021.results, # HBV
+                         Fourati.2015.LR = Fourati.2015.LR.2021.results, # HBV
+                         Furman.2013.Age = Furman.2013.Age.2021.results, 
+                         Iulio.2021.HBV = Iulio.2021.HBV.transfer.sig.2021.results, # HBV
+                         Iulio.2021.Influenza.F = Iulio.2021.Inf.F.transfer.sig.2021.results, # Influenza
+                         Iulio.2021.Influenza.M = Iulio.2021.Inf.M.transfer.sig.2021.results, # Influenza
+                         Iulio.2021.TB = Iulio.2021.TB.transfer.sig.2021.results, # TB (marques)
+                         Fourati.2021.RF = Fourati.2021.RF.2021.results, # Multiple vaccines
+                         Bartholomeus.2018.gene.sig = Bartholomeus.2018.gene.sig.2021.results, # HBV
+                         Bartholomeus.2018.NB = Bartholomeus.2018.NB.2021.results, # HBV
+                         Qui.2018.gene.sig = Qui.2018.gene.sig.2021.results, # HBV
+                         Franco.2013.gene.sig = Franco.2013.gene.sig.2021.results) # Influenza
+
+
+```
+
+## Initialize functions for collect data and plotting
+
+```{r}
+
+collectData <- function(data, metric, outcome="raw", selected.models=NULL,
+                        selected.outcomes=NULL){
+   
+   if(!is.null(selected.models)){
+      models <- selected.models
+   } else {
+      models <- names(data)
+   }
+   
+   df.collect <- data.frame()
+   if(tolower(metric) == "spearman"){
+      for(model in models){
+         
+         if(outcome == "raw"){
+            
+            # Collect the relevant columns from the results
+            tmp <- data[[model]][["results"]][, c("isotype_antigen", "corr.value", 
+                                                  "corr.p.value", "stars.corr.raw")] %>% 
+               distinct() %>% 
+               dplyr::rename(stars = stars.corr.raw)
+            
+            # Name model, create label and save in dataframe
+            tmp$model <- model
+            tmp$corr.label <- round(tmp$corr.value, 2)
+            df.collect <- rbind(df.collect, tmp)
+            
+         } else if (outcome == "fc"){
+            # Collect the relevant columns from the results
+            tmp <- data[[model]][["results"]][, c("isotype_antigen", "corr.fc.value", 
+                                                  "corr.fc.p.value", "stars.corr.fc")] %>% 
+               distinct() %>% 
+               dplyr::rename(corr.value = corr.fc.value,
+                             corr.p.value = corr.fc.p.value,
+                             stars = stars.corr.fc)
+            
+            # Name model, create label and save in dataframe
+            tmp$model <- model
+            tmp$corr.label <- round(tmp$corr.value, 2)
+            df.collect <- rbind(df.collect, tmp)
+         
+         }
+      }
+      df.collect <- df.collect %>% 
+         distinct()
+      
+      if(!is.null(selected.outcomes)){
+          df.collect <- df.collect %>% 
+              filter(isotype_antigen %in% selected.outcomes)
+          
+      }
+      
+      
+      # Perform multiple testing correction
+      df.collect[["corr.p.value.adj"]] <- p.adjust(df.collect$corr.p.value, 
+                                                   method = "BH")
+      
+      print(summary(df.collect))
+      
+      return(df.collect)
+      
+   } else if(tolower(metric) == "auc"){
+      
+      for(model in models){
+         
+         if(outcome == "raw"){
+            
+            # Collect the relevant columns from the results
+            tmp <- data[[model]][["results"]][, c("isotype_antigen", "auc.score", 
+                                                  "auc.p.value", "stars.auc.raw")] %>% 
+               distinct() %>% 
+               dplyr::rename(stars = stars.auc.raw)
+            
+            # Name model, create label and save in dataframe
+            tmp$model <- model
+            tmp$auc.label <- round(tmp$auc.score, 2)
+            df.collect <- rbind(df.collect, tmp)
+            
+         } else if (outcome == "fc"){
+            # Collect the relevant columns from the results
+            tmp <- data[[model]][["results"]][, c("isotype_antigen", "auc.score.fc", 
+                                                  "auc.p.value.fc", "stars.auc.fc")] %>% 
+               distinct() %>% 
+               dplyr::rename(auc.score = auc.score.fc,
+                             auc.p.value = auc.p.value.fc,
+                             stars = stars.auc.fc)
+            
+            # Name model, create label and save in dataframe
+            tmp$model <- model
+            tmp$auc.label <- round(tmp$auc.score, 2)
+            df.collect <- rbind(df.collect, tmp)
+         
+         }
+      }
+      
+      df.collect <- df.collect %>% 
+         distinct()
+      
+      if(!is.null(selected.outcomes)){
+          df.collect <- df.collect %>% 
+              filter(isotype_antigen %in% selected.outcomes)
+          
+      }
+      
+      # Perform multiple testing correction
+      df.collect[["auc.p.value.adj"]] <- p.adjust(df.collect$auc.p.value, 
+                                                   method = "BH")
+      print(summary(df.collect))
+      
+      return(df.collect)
+   }
+}
+
+plotHeatmap <- function(data, x, y, metric, value, label1, label2){
+   
+   rwb <- colorRampPalette(colors = c("red", "white", "blue"))
+   
+   if(tolower(metric) == "spearman"){
+      legend.title <- "Spearman's\nCorrelation"
+      limits <- c(-1,1)
+      custom.colors <- rev(rwb(200))
+      # custom.colors <- c("#0000FF", "#3838FF", "#7171FF", "#AAAAFF", "#E2E2FF",
+      #                    "#FFFFFF", "#FFFFFF", "#FFE2E2", "#FFAAAA", 
+      #                    "#FF7171", "#FF3838", "#FF0000")
+   } else if(tolower(metric) == "auc"){
+      legend.title <- "AUC score"
+      limits <- c(0,1)
+      custom.colors <- c("#0000FF", "#3838FF", "#7171FF", "#AAAAFF",
+                         "#FFFFFF", "#FFFFFF", "#FFAAAA", 
+                         "#FF7171", "#FF3838", "#FF0000")
+   }
+
+   plot <-  ggplot(data, aes_string(x = x, y = y, col=value, label=label2)) +
+      geom_tile(col="black", fill="white") +
+      geom_point(aes_string(size = abs(data[[value]])), shape="square") +
+      scale_size(range=c(8, 20), guide=NULL)  + 
+      labs(x = NULL, y = NULL, col = legend.title) +
+      theme_classic() + 
+      coord_fixed() + 
+      geom_text(aes_string(label=label1), color = "black", size = 6) +
+      geom_text(aes_string(label=label2), color="black", size=7, nudge_y = -0.3) +
+      scale_color_gradientn(colors=custom.colors, limits=limits, space = "Lab")  +
+      scale_x_discrete(expand=c(0,0)) +
+      scale_y_discrete(expand=c(0,0)) +
+      theme(axis.text.x = element_text(angle = 45, vjust = 1, size = 15, 
+                                       hjust = 1, colour = "black"),
+         axis.text.y = element_text(size=15, colour = "black")) +
+      geom_vline(xintercept=1:length(unique(data$model))-0.5, 
+                 colour="gray", size=0.5) +
+      geom_hline(yintercept=1:length(unique(data$isotype_antigen))-0.5, 
+                 colour="gray", size=0.5) 
+   
+   return(plot)
+   
+}
+
+```
+
+## Heatmaps of 2020 results
+
+```{r}
+
+####### DAY 14 #######
+### Spearman's correlation 
+df.collect.corr.day14.2020 <- collectData(data=df.2020.combined, metric="spearman", outcome = "raw")
+plotHeatmap(df.collect.corr.day14.2020, x="model", y="isotype_antigen", metric = "spearman",
+            value="corr.value", label1 = "corr.label", label2 = "stars")
+ggsave(filename="2020/Heatmap_Spearman_day14_new.png", 
+       dpi = 400, width = 18, height = 8)
+
+### AUC
+df.collect.auc.day14.2020 <- collectData(data=df.2020.combined, metric="AUC", outcome = "raw")
+plotHeatmap(df.collect.auc.day14.2020, x="model", y="isotype_antigen", metric = "AUC",
+            value="auc.score", label1 = "auc.label", label2 = "stars")
+ggsave(filename="2020/Heatmap_AUC_day14_new.png", 
+       dpi = 400, width = 18, height = 8)
+
+
+####### FOLD-CHANGE #######
+### Spearman's correlation 
+df.collect.corr.FC.2020 <- collectData(data=df.2020.combined, metric="spearman", outcome = "fc")
+plotHeatmap(df.collect.corr.FC.2020, x="model", y="isotype_antigen", metric = "spearman",
+            value="corr.value", label1 = "corr.label", label2 = "stars")
+ggsave(filename="2020/Heatmap_Spearman_FC_new.png", 
+       dpi = 400, width = 18, height = 8)
+
+### AUC
+df.collect.auc.FC.2020 <- collectData(data=df.2020.combined, metric="AUC", outcome = "fc")
+plotHeatmap(df.collect.auc.FC.2020, x="model", y="isotype_antigen", metric = "AUC",
+            value="auc.score", label1 = "auc.label", label2 = "stars")
+ggsave(filename="2020/Heatmap_AUC_FC_new.png", 
+       dpi = 400, width = 18, height = 8)
+```
+
+## Heatmaps of 2021 results
+
+```{r}
+
+####### DAY 14 #######
+
+selected.models <- c("Avey.2017.gene.sig", "Avey.2017.M54", "Avey.2017.M33", 
+                     "Tsang.2015.DLDA.top2", "Kotliarov.2020.TGSig", "Furman.2013.Age")
+selected.outcomes <- c("IgG4-FHA", "IgG4-PT")
+
+### Spearman's correlation 
+df.collect.corr.day14.2021 <- collectData(data=df.2021.combined, metric="spearman", outcome = "raw")
+plotHeatmap(df.collect.corr.day14.2021, x="model", y="isotype_antigen", metric = "spearman",
+            value="corr.value", label1 = "corr.label", label2 = "stars")
+ggsave(filename="2021/Heatmap_Spearman_day14_full.png", 
+       dpi = 400, width = 18, height = 8)
+
+### AUC
+df.collect.auc.day14.2021 <- collectData(data=df.2021.combined, metric="AUC", outcome = "raw")
+plotHeatmap(df.collect.auc.day14.2021, x="model", y="isotype_antigen", metric = "AUC",
+            value="auc.score", label1 = "auc.label", label2 = "stars")
+ggsave(filename="2021/Heatmap_AUC_day14_full.png", 
+       dpi = 400, width = 18, height = 8)
+
+
+####### FOLD-CHANGE #######
+
+selected.models <- c("Iulio.2021.Influenza.M", "Avey.2017.M42", "Tsang.2015.DLDA.top2")
+selected.outcomes <- c("IgG-PRN", "IgG-PT", "IgG1-PT")
+
+### Spearman's correlation 
+df.collect.corr.FC.2021 <- collectData(data=df.2021.combined, metric="spearman", 
+                               outcome = "fc")
+plotHeatmap(df.collect.corr.FC.2021, x="model", y="isotype_antigen", metric = "spearman",
+            value="corr.value", label1 = "corr.label", label2 = "stars")
+ggsave(filename="2021/Heatmap_Spearman_FC_full.png", 
+       dpi = 400, width = 18, height = 8)
+
+### AUC
+df.collect.auc.FC.2021 <- collectData(data=df.2021.combined, metric="AUC", 
+                              outcome = "fc")
+plotHeatmap(df.collect.auc.FC.2021, x="model", y="isotype_antigen", metric = "AUC",
+            value="auc.score", label1 = "auc.label", label2 = "stars")
+ggsave(filename="2021/Heatmap_AUC_FC_full.png", 
+       dpi = 400, width = 18, height = 8)
+```
+
+
+
+## Compare results with Pramod - Spearman
+
+```{r}
+library('stringr')
+pramod.results.corr <- readRDS(file = "mikkel_ab_master_corr.rds") %>% 
+   separate(task, into=c("task", "antigen"), sep = "\\) ") %>% 
+   dplyr::mutate(isotype_antigen = recode(antigen, 
+                                          `Pertussis Toxin` = "IgG-PT", 
+                                          `FHA` = 'IgG-FHA', 
+                                          `Pertactin` =  'IgG-PRN',
+                                          `IgG1 - Pertussis toxin` = "IgG1-PT",
+                                          `IgG1 - FHA` = "IgG1-FHA",
+                                          `IgG4 - Pertussis toxin` = "IgG4-PT",
+                                          `IgG4 - FHA` = "IgG4-FHA"))
+
+pramod.results.corr$file_show <- tolower(pramod.results.corr$file_show)
+pramod.results.corr$file_show <- str_replace_all(pramod.results.corr$file_show, '\\+', '_')
+pramod.results.corr$file_show <- str_replace_all(pramod.results.corr$file_show, '\\-', '_')
+df.collect.corr.day14.2021$file_show <- str_replace_all(df.collect.corr.day14.2021$model, '\\.', '_')
+df.collect.corr.day14.2021$file_show <- tolower(df.collect.corr.day14.2021$file_show)
+df.collect.corr.day14.2021 <- df.collect.corr.day14.2021 %>% 
+   dplyr::mutate(file_show = recode(file_show, 
+                                    `iulio_2021_influenza_f` = "iulio_2021_inf_f_transfer_sig",
+                                    `iulio_2021_influenza_m` = "iulio_2021_inf_m_transfer_sig",
+                                    `iulio_2021_hbv` = "iulio_2021_hbv_transfer_sig",
+                                    `iulio_2021_tb` = "iulio_2021_tb_transfer_sig",
+                                    `tsang_2015_dlda_top2` = "tsang_2014_dlda_top2",
+                                    `tsang_2015_dlda_top5` = "tsang_2014_dlda_top5"))
+
+combined.results.MR.PS.corr <- pramod.results.corr %>% 
+   inner_join(., df.collect.corr.day14.2021, by=c("file_show", "isotype_antigen"))
+combined.results.MR.PS.corr.selected <- combined.results.MR.PS.corr %>% 
+   dplyr::select(file_show, task, isotype_antigen, estimate, corr.value) %>% 
+   dplyr::mutate(difference = estimate - corr.value)
+
+```
+
+## Compare results with Pramod - AUC
+
+
+```{r}
+library('stringr')
+pramod.results.AUC <- readRDS(file = "mikkel_ab_master_auc_v3.rds") %>% 
+   separate(task_show, into=c("isotype_antigen", "timepoint"), sep = "-")
+pramod.results.AUC$isotype_antigen <- str_replace_all(pramod.results.AUC$isotype_antigen, '_', '-')
+pramod.results.AUC$file_show <- tolower(pramod.results.AUC$file_show)
+pramod.results.AUC$file_show <- str_replace_all(pramod.results.AUC$file_show, '\\+', '_')
+pramod.results.AUC$file_show <- str_replace_all(pramod.results.AUC$file_show, '\\-', '_')
+
+df.collect.auc.day14.2021$file_show <- str_replace_all(df.collect.auc.day14.2021$model, '\\.', '_')
+df.collect.auc.day14.2021$file_show <- tolower(df.collect.auc.day14.2021$file_show)
+df.collect.auc.day14.2021 <- df.collect.auc.day14.2021 %>% 
+   dplyr::mutate(file_show = recode(file_show, 
+                                    `iulio_2021_influenza_f` = "iulio_2021_inf_f_transfer_sig",
+                                    `iulio_2021_influenza_m` = "iulio_2021_inf_m_transfer_sig",
+                                    `iulio_2021_hbv` = "iulio_2021_hbv_transfer_sig",
+                                    `iulio_2021_tb` = "iulio_2021_tb_transfer_sig",
+                                    `tsang_2015_dlda_top2` = "tsang_2014_dlda_top2",
+                                    `tsang_2015_dlda_top5` = "tsang_2014_dlda_top5"))
+
+combined.results.MR.PS.AUC <- pramod.results.AUC %>% 
+   inner_join(., df.collect.auc.day14.2021, by=c("file_show", "isotype_antigen"))
+combined.results.MR.PS.AUC.selected <- combined.results.MR.PS.AUC %>% 
+   dplyr::select(file_show, isotype_antigen, auc_5050, auc.label) %>% 
+   dplyr::mutate(auc.score.rev = 1 - auc.label,
+                 difference = auc_5050 - auc.label,
+                 difference = round(difference, 2))
+
+save(df.collect.auc.day14.2021, file = "AUC_values_mikkel.RData")
+
+```
+
+
+## Comparison of results from 2020 to 2021
+
+```{r}
+
+library(zoo)
+library(lubridate)
+library(ggplot2)
+selected.models.outcomes <- c("Avey.2017.gene.sig - IgG4-PT", "Avey.2017.M54 - IgG4-PT",
+                              "Furman.2013.Age - IgG4-PT", "Avey.2017.M33 - IgG4-FHA",
+                              "Furman.2013.Age - IgG4-FHA", "Tsang.2015.DLDA.top2 - IgG4-FHA",
+                              "Kotliarov.2020.TGSig - IgG4-FHA")
+
+# Spearman's correlation day 14 - 2020 vs 2021
+df.results.corr.2020 <- df.collect.corr.day14.2020 %>% 
+   unite(col = "model_outcome", c("model", "isotype_antigen"), sep = " - ", 
+         remove = F) %>% 
+   filter(model_outcome %in% selected.models.outcomes) %>% 
+   mutate(year = 2020)
+
+df.results.corr.2021 <- df.collect.corr.day14.2021 %>% 
+   unite(col = "model_outcome", c("model", "isotype_antigen"), sep = " - ", 
+         remove = F) %>% 
+   filter(model_outcome %in% selected.models.outcomes) %>% 
+   mutate(year = 2021)
+
+df.results.corr.2021$corr.p.value.adj <- p.adjust(df.results.corr.2021$corr.p.value,
+                                                  method = "BH")
+# View(df.results.corr.2021)
+data.corr.day14 <- rbind(df.results.corr.2020, df.results.corr.2021)
+data.corr.day14 %>% 
+   ggplot(aes(x=factor(year), y=corr.value, group=model_outcome, color=model_outcome)) +
+   geom_line(size=0.9) +
+   geom_point(size=6, alpha=0.9) +
+   labs(x="Year", y="Spearman's correlation", 
+        colour="Model and day 14 antibody response") +
+   theme_classic() + 
+   geom_text_repel(aes(label=stars, group = model_outcome), show.legend = FALSE,
+                   size = 30 / .pt, box.padding = 0.7) +
+   theme(axis.text.x = element_text(size = 20),
+         axis.text.y = element_text(size = 20),
+         legend.text = element_text(size = 12),
+         legend.title = element_text(size = 14),
+         axis.title.x = element_text(size = 20),
+         axis.title.y = element_text(size = 20),
+         legend.box.just = "left",
+         legend.justification = c(1,0),
+         legend.position = c(0.98,0.7)) + 
+   scale_x_discrete() +
+   scale_y_continuous(limits = c(-1, 1)) + 
+   geom_hline(yintercept = 0, linetype='dashed', size=1) + 
+   annotate("text", x=0.55, y=0, vjust = -1, label = "Random", size=5)
+
+ggsave(filename="Comparing_2020_and_2021_corr_day14.png", 
+       dpi = 400, width = 8, height = 8)
+
+# AUC day 14 - 2020 vs 2021
+df.results.AUC.2020 <- df.collect.auc.day14.2020 %>% 
+   unite(col = "model_outcome", c("model", "isotype_antigen"), sep = " - ", 
+         remove = F) %>% 
+   filter(model_outcome %in% selected.models.outcomes) %>% 
+   mutate(year = 2020)
+
+df.results.AUC.2021 <- df.collect.auc.day14.2021 %>% 
+   unite(col = "model_outcome", c("model", "isotype_antigen"), sep = " - ", 
+         remove = F) %>% 
+   filter(model_outcome %in% selected.models.outcomes) %>% 
+   mutate(year = 2021)
+
+df.results.AUC.2021$auc.p.value.adj <- p.adjust(df.results.AUC.2021$auc.p.value,
+                                                  method = "BH")
+
+# View(df.results.AUC.2021)
+library(ggrepel)
+data.AUC.day14 <- rbind(df.results.AUC.2020, df.results.AUC.2021)
+data.AUC.day14 %>% 
+   ggplot(aes(x=factor(year), y=auc.score, group=model_outcome, color=model_outcome)) +
+   geom_line(size=0.9) +
+   geom_point(size=6, alpha=0.9) +
+   labs(x="Year", y="AUC", 
+        colour="Model and day 14 antibody response") +
+   theme_classic() + 
+   geom_text_repel(aes(label=stars, group = model_outcome), show.legend = FALSE,
+                   size = 30 / .pt, box.padding = 0.6) +
+   theme(axis.text.x = element_text(size = 20),
+         axis.text.y = element_text(size = 20),
+         legend.text = element_text(size = 12),
+         legend.title = element_text(size = 14),
+         axis.title.x = element_text(size = 20),
+         axis.title.y = element_text(size = 20),
+         legend.box.just = "left",
+         legend.justification = c(1,0),
+         legend.position = c(0.5,0.1)) + 
+   scale_x_discrete() +
+   scale_y_continuous(limits = c(0, 1)) + 
+   geom_hline(yintercept = 0.5, linetype='dashed', size=1) + 
+   annotate("text",x =0.55, y=0.5, vjust = -1, label = "Random", size=5)
+
+
+ggsave(filename="Comparing_2020_and_2021_AUC_day14.png", 
+       dpi = 400, width = 8, height = 8)
+
+
+ # Spearman's correlation fold-change - 2020 vs 2021
+
+selected.models.outcomes <- c("Avey.2017.M42 - IgG-PT","Tsang.2015.DLDA.top2 - IgG-PRN",
+                              "Iulio.2021.Influenza.M - IgG1-PT")
+
+df.results.corr.FC.2020 <- df.collect.corr.FC.2020 %>% 
+   unite(col = "model_outcome", c("model", "isotype_antigen"), sep = " - ", 
+         remove = F) %>% 
+   filter(model_outcome %in% selected.models.outcomes) %>% 
+   mutate(year = 2020)
+
+df.results.corr.FC.2021 <- df.collect.corr.FC.2021 %>% 
+   unite(col = "model_outcome", c("model", "isotype_antigen"), sep = " - ", 
+         remove = F) %>% 
+   filter(model_outcome %in% selected.models.outcomes) %>% 
+   mutate(year = 2021)
+
+data.corr.FC <- rbind(df.results.corr.FC.2020, df.results.corr.FC.2021)
+data.corr.FC %>% 
+   ggplot(aes(x=factor(year), y=corr.value, group=model_outcome, color=model_outcome)) +
+   geom_line(size=0.9) +
+   geom_point(size=6, alpha=0.9) +
+   labs(x="Year", y="Spearman's correlation", 
+        colour="Model and fold-change antibody response") +
+   theme_classic() + 
+   geom_text_repel(aes(label=stars, group = model_outcome), show.legend = FALSE,
+                   size = 30 / .pt, box.padding = 0.6) + 
+   theme(axis.text.x = element_text(size = 20),
+         axis.text.y = element_text(size = 20),
+         legend.text = element_text(size = 12),
+         legend.title = element_text(size = 14),
+         axis.title.x = element_text(size = 20),
+         axis.title.y = element_text(size = 20),
+         legend.box.just = "left",
+         legend.justification = c(1,0),
+         legend.position = c(0.98,0.1)) + 
+   scale_x_discrete() +
+   scale_y_continuous(limits = c(-1, 1)) + 
+   geom_hline(yintercept = 0, linetype='dashed', size=1) + 
+   annotate("text", x=0.55, y=0, vjust = -1, label = "Random", size=5)
+
+ggsave(filename="Comparing_2020_and_2021_corr_FC.png", 
+       dpi = 400, width = 8, height = 8)
+
+# AUC day 14 - 2020 vs 2021
+df.results.AUC.FC.2020 <- df.collect.auc.FC.2020 %>% 
+   unite(col = "model_outcome", c("model", "isotype_antigen"), sep = " - ", 
+         remove = F) %>% 
+   filter(model_outcome %in% selected.models.outcomes) %>% 
+   mutate(year = 2020)
+
+df.results.AUC.FC.2021 <- df.collect.auc.FC.2021 %>% 
+   unite(col = "model_outcome", c("model", "isotype_antigen"), sep = " - ", 
+         remove = F) %>% 
+   filter(model_outcome %in% selected.models.outcomes) %>% 
+   mutate(year = 2021)
+
+data.AUC.FC <- rbind(df.results.AUC.FC.2020, df.results.AUC.FC.2021)
+data.AUC.FC %>% 
+   ggplot(aes(x=factor(year), y=auc.score, group=model_outcome, color=model_outcome)) +
+   geom_line(size=0.9) +
+   geom_point(size=6, alpha=0.9) +
+   labs(x="Year", y="AUC", 
+        colour="Model and fold-change antibody response") +
+   theme_classic() + 
+   geom_text_repel(aes(label=stars, group = model_outcome), show.legend = FALSE,
+                   size = 30 / .pt, box.padding = 0.6) + 
+   theme(axis.text.x = element_text(size = 20),
+         axis.text.y = element_text(size = 20),
+         legend.text = element_text(size = 12),
+         legend.title = element_text(size = 14),
+         axis.title.x = element_text(size = 20),
+         axis.title.y = element_text(size = 20),
+         legend.box.just = "left",
+         legend.justification = c(1,0),
+         legend.position = c(0.98,0.7)) + 
+   scale_x_discrete() +
+   scale_y_continuous(limits = c(0, 1)) + 
+   geom_hline(yintercept = 0.5, linetype='dashed', size=1) + 
+   annotate("text", x=0.55, y=0.5, vjust = -1, label = "Random", size=5)
+
+ggsave(filename="Comparing_2020_and_2021_AUC_FC.png", 
+       dpi = 400, width = 8, height = 8)
+
+```
+
+
+# Comparison of the ROC curves for the top n best AUC scores
+
+```{r}
+
+plotROC <- function(data, top=NULL, significant=FALSE, save=FALSE){
+
+   # Internal function for generating ROC plot
+   .createPlot <- function(data, spec, sens, group, title, df.metrics){
+      plot <- ggplot(data, aes_string(x=spec, y=sens, group=group, color=group,
+                              linetype=group)) +
+         geom_line(size=1) +
+         geom_abline(intercept = 1, slope = 1, lty=2) +
+         scale_x_reverse()  +
+         coord_fixed() + 
+         theme_bw() + 
+         theme(panel.grid = element_blank()) + 
+         ggtitle(iso.ag) + 
+         scale_color_hue(h = c(180, 300)) + 
+         theme(
+            legend.position = c(.95, .05),
+            legend.justification = c("right", "bottom"),
+            legend.box.just = "right",
+            legend.margin = margin(6, 6, 6, 6),
+            legend.key = element_rect(fill = "white", colour = "black")
+            )
+      return(plot)
+   }
+   
+   # Determine the top n best AUC scores for each isotype-antigen pair
+   df.collect <- data.frame()
+   for(model in names(data)){
+         
+         # Collect the relevant columns from the results
+         tmp <- data[[model]][["results"]][, c("isotype_antigen", "auc.score", 
+                                               "auc.p.value", "stars.auc.raw")] %>% 
+            distinct() %>% 
+            dplyr::rename(stars = stars.auc.raw)
+         
+         # Name model, create label and save in dataframe
+         tmp$model <- model
+         tmp$auc.label <- sprintf("AUC = %.2g", tmp$auc.score)
+         df.collect <- rbind(df.collect, tmp)
+   }
+   
+   if(!is.null(top)){
+      # Top N highest AUC scores by group
+      topN <- df.collect %>%                                      
+         arrange(desc(auc.score)) %>% 
+         group_by(isotype_antigen) %>%
+         slice(1:top)   
+   } else if(significant){
+      topN <- df.collect %>% 
+         filter(stars %in% c("*", "**", "***"))
+      
+      
+   }
+   
+   # Extract specificity and sensitivity for the top 5 of each group
+   df.roc <- data.frame()
+   for(model in unique(topN$model)){
+      
+      current.isotype.antigen <- topN[topN$model == model, ]$isotype_antigen 
+      
+      # Collect the relevant columns from the results
+      tmp <- data[[model]][["roc"]] %>% 
+         filter(isotype_antigen %in% current.isotype.antigen)
+         
+      # Save in dataframe
+      tmp$model <- model
+      df.roc <- rbind(df.roc, tmp)
+   }
+   # Create heatmap plot
+   for(iso.ag in unique(df.roc$isotype_antigen)){
+      
+      current.auc.metrics <- topN[topN$isotype_antigen == iso.ag, ]
+      
+      plot <- .createPlot(data=df.roc[df.roc$isotype_antigen == iso.ag, ], 
+                          spec='Specificity', sens='Sensitivity', group="model",
+                          title=iso.ag, df.metrics=current.auc.metrics)
+      print(plot)
+      if(save){
+         ggsave(paste0(iso.ag, "_ROC_curve_top_", top, ".png"),
+                dpi = 400, height = 13, width = 16)
+      }
+      
+   }
+   
+}
+
+plotROC(data=df.combined, top=5, significant=TRUE, save=TRUE)
+   
+
+```
+## Create boxplot for comparing the performance of the models on each isotype-antigen
+
+```{r}
+
+plotBoxplot <- function(data, metric, across){
+    
+   # Internal fuction for creating the boxplots
+   .createPlot <- function(data, x.var, y.var){
+       plot <- ggplot(data, aes_string(x=x.var, y=y.var, group=x.var, fill=x.var)) +
+        geom_boxplot(aes_string(x.var), alpha=1, 
+                     outlier.colour=NA) +
+        theme_bw() +
+        theme(panel.border = element_blank(),
+              strip.background = element_blank(),
+              strip.text.x = element_text(size=12),
+              panel.spacing = unit(0,"mm"),
+              panel.grid.major.x = element_blank(),
+              axis.ticks = element_blank(),
+              axis.text.x = element_text(size=15, colour = "black"),
+              axis.text.y = element_text(size=15, colour = "black"))
+       
+       return(plot)
+    }
+    
+    df.collect <- data.frame()
+    if(tolower(metric) == "auc"){
+       if(tolower(across) == "isotype_antigen"){
+       
+       # Collect metrics 
+       for(model in names(data)){
+         
+         # Collect the relevant columns from the results
+         tmp <- data[[model]][["results"]][, c("isotype_antigen", "auc.score")]
+         
+         # Name model, create label and save in dataframe
+         tmp$model <- model
+         df.collect <- rbind(df.collect, tmp)
+    }
+    # Generate plot and print
+    plot <- .createPlot(data=df.collect, x.var="isotype_antigen", 
+                        y.var='auc.score')
+    print(plot)
+       
+    }else if(tolower(across) == "model"){
+       for(model in names(data)){
+         # Collect the relevant columns from the results
+         tmp <- data[[model]][["results"]][, c("isotype_antigen", "auc.score")]
+         
+         # Name model, create label and save in dataframe
+         tmp$model <- model
+         df.collect <- rbind(df.collect, tmp)
+       }
+      plot <- .createPlot(data=df.collect, x.var="model", y.var='auc.score') +
+         theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+                                    size = 12, hjust = 1,
+                                    colour = "black"))
+      print(plot)
+      }
+    }
+    
+       
+    if(tolower(metric) == "spearman"){
+       if(tolower(across) == "isotype_antigen"){
+       
+       # Collect metrics 
+       for(model in names(data)){
+         
+         # Collect the relevant columns from the results
+         tmp <- data[[model]][["results"]][, c("isotype_antigen", "corr.value")]
+         
+         # Name model, create label and save in dataframe
+         tmp$model <- model
+         df.collect <- rbind(df.collect, tmp)
+    }
+    # Generate plot and print
+    plot <- .createPlot(data=df.collect, x.var="isotype_antigen", 
+                        y.var='corr.value')
+    print(plot)
+       
+    }else if(tolower(across) == "model"){
+       
+       for(model in names(data)){
+         
+         # Collect the relevant columns from the results
+         tmp <- data[[model]][["results"]][, c("isotype_antigen", "corr.value")]
+         
+         # Name model, create label and save in dataframe
+         tmp$model <- model
+         df.collect <- rbind(df.collect, tmp)
+       }
+       
+      plot <- .createPlot(data=df.collect, x.var="model", y.var='corr.value') +
+         theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+                                    size = 12, hjust = 1,
+                                    colour = "black"))
+      print(plot)
+      }
+   }
+}
+
+plotBoxplot(data=df.combined, metric="AUC", across="model")
+ggsave("Boxplot_AUC_across_models_day14.png", dpi = 400, height = 10, width = 16)
+
+plotBoxplot(data=df.combined, metric="spearman", across="model")
+ggsave("Boxplot_spearman_across_models_day14.png", dpi = 400, height = 10, width = 16)
+
+plotBoxplot(data=df.combined, metric="AUC", across="isotype_antigen")
+ggsave("Boxplot_AUC_across_isotype_antigen_day14.png", dpi = 400, height = 10, width = 16)
+
+plotBoxplot(data=df.combined, metric="spearman", across="isotype_antigen")
+ggsave("Boxplot_spearman_across_isotype_antigen_day14.png", dpi = 400, height = 10, width = 16)
+
+
+```
+
