@@ -10,3 +10,7 @@ Briefly summarized, a literature review was performed to identify previously pre
 The repository contains a folder containing a Rmarkdown file of the workflow for evaluating the prediction models in each of the 10 studies included in the project.
 
 - First step is to download the data used in this project. This can be accomplished by running the scripts `download_from_webpage_links.sh` in order to download the data files, and next running `Standardize_data.ipynb` to perform preprocessing the data files.
+
+- After the data has been downloaded and processed, the Rmarkdown files for each of the studies can be run. These files contains the workflows for evaluating all of the prediction methods included in this project.
+
+- Finaly, the comparative analysis can be run to compare the results from all of the prediction methods.
