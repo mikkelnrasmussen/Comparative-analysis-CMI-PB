@@ -39,4 +39,4 @@ vignettes/*.pdf
 .Renviron
 
 # Data folder
-Data/
+Data/raw/
