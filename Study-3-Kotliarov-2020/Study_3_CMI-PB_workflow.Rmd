@@ -332,7 +332,8 @@ df.IFN.I.DCact.2020.pred.DESEQ <- geneSigCalc(gene.ex.data=ge.norm.2020.day0,
                                               gene.sig=IFN_I_DCact.gene.sig, 
                                               post.ab.data=abt.2020.day14,
                                               pre.ab.data=abt.2020.day0,
-                                              filter.ab.ag=selected.iso.ag)
+                                              filter.ab.ag=selected.iso.ag,
+                                              verbose=TRUE)
 
 # Evaluate gene signature with DESEQ normalized gene expression
 Kotliarov.2020.IFN.I.DCact.2020.results.DESEQ <- evaluateModel(df.prediction=df.IFN.I.DCact.2020.pred.DESEQ,
@@ -499,7 +500,7 @@ df.TGSig.2021.pred <- geneSigCalc(gene.ex.data=ge.norm.2021.day0,
 
 # Evaluate gene signature with DESeq2 normalized gene expression
 Kotliarov.2020.TGSig.2021.results <- evaluateModel(df.prediction=df.TGSig.2021.pred,
-                                                   N.perm = 1000, direction = "<",
+                                                   N.perm = 10000, direction = "<",
                                                    add.to.title='- DESeq2 VST normalized',
                                                    score.label = 'TGSig signature score',
                                                    fn1='TGSig_vs_day14_heatmap',
@@ -527,7 +528,7 @@ df.SLE.Sig.2021.pred <- geneSigCalc(gene.ex.data=ge.norm.2021.day0,
 
 # Evaluate gene signature with DESEQ normalized gene expression
 Kotliarov.2020.SLE.Sig.2021.results <- evaluateModel(df.prediction=df.SLE.Sig.2021.pred,
-                                                     N.perm = 1000, direction = "<",
+                                                     N.perm = 10000, direction = "<",
                                                      add.to.title='- DESeq2 VST normalized',
                                                      score.label = 'SLE-Sig signature score',
                                                      fn1='SLE-Sig_vs_day14_heatmap',
@@ -555,7 +556,7 @@ df.IFN.I.DCact.2021.pred <- geneSigCalc(gene.ex.data=ge.norm.2021.day0,
 
 # Evaluate gene signature with DESEQ normalized gene expression
 Kotliarov.2020.IFN.I.DCact.2021.results <- evaluateModel(df.prediction=df.IFN.I.DCact.2021.pred,
-                                                         N.perm = 1000, direction = "<",
+                                                         N.perm = 10000, direction = "<",
                                                          add.to.title='- DESeq2 VST normalized',
                                                          score.label = 'IFN-I-DCact signature score',
                                                          fn1='IFN-I-DCact_vs_day14_heatmap',
