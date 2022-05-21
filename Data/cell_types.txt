@@ -1,0 +1,67 @@
+cell_type_name,dataset,gating_definition,gating_method
+Monocytes,2020_dataset,HLA-DR+CD33+,Automated
+Classical_Monocytes,2020_dataset,HLA-DR+CD33+CD14+CD16-,Automated
+Intermediate_Monocytes,2020_dataset,HLA-DR+CD33+CD14+CD16+,Automated
+Non-Classical_Monocytes,2020_dataset,HLA-DR+CD33+CD14-CD16+,Automated
+"CD3 Tcells",2020_dataset,CD14-CD3+CD19-CD56-,Automated
+Bcells,2020_dataset,CD14-CD3-CD19+,Automated
+CD8Tcells,2020_dataset,CD14-CD3+CD19-CD56-CD4-CD8+,Automated
+CD4Tcells,2020_dataset,CD14-CD3+CD19-CD56-CD4+CD8-,Automated
+NaiveCD4,2020_dataset,CD14-CD3+CD19-CD56-CD8-CD4+CD45RA+CCR7+,Automated
+TcmCD4,2020_dataset,CD14-CD3+CD19-CD56-CD8-CD4+CD45RA-CCR7+,Automated
+TemCD4,2020_dataset,CD14-CD3+CD19-CD56-CD8-CD4+CD45RA-CCR7-,Automated
+TemraCD4,2020_dataset,CD14-CD3+CD19-CD56-CD8-CD4+CD45RA+CCR7-,Automated
+NaiveCD8,2020_dataset,CD14-CD3+CD19-CD56-CD8+CD4-CD45RA+CCR7+,Automated
+TemCD8,2020_dataset,CD14-CD3+CD19-CD56-CD8+CD4-CD45RA-CCR7+,Automated
+TcmCD8,2020_dataset,CD14-CD3+CD19-CD56-CD8+CD4-CD45RA-CCR7-,Automated
+TemraCD8,2020_dataset,CD14-CD3+CD19-CD56-CD8+CD4-CD45RA+CCR7-,Automated
+Tregs,2020_dataset,CD14-CD3+CD19-CD56-CD4+CD8-CD25+,Automated
+"ASCs (Plasmablasts)",2020_dataset,CD14-CD3-CD19+CD20-CD38+,Manual
+NK,2020_dataset,CD14-CD3-CD19-CD56+,Automated
+pDC,2020_dataset,CD14-CD3-CD19-CD56-CD16-HLA-DR+CD1c-CD123+,Automated
+mDC,2020_dataset,CD14-CD3-CD19-CD56-CD16-HLA-DR+CD1c+CD123-,Automated
+CD33HLADR,2020_dataset,nan,nan
+CD3CD19,2020_dataset,nan,nan
+CD3CD19neg,2020_dataset,nan,nan
+Basophils,2020_dataset,nan,nan
+"Lineage negative cells (CD3-CD19-CD56-HLA-DR-CD123-CD66b-)",2021_dataset,CD19-CD3-CD56-HLA-DR-HLA-DR-CD66b-CD123-,Manual
+Monocytes,2021_dataset,CD19-CD3-CD56-HLA-DR+,Manual
+Classical_Monocytes,2021_dataset,CD19-CD3-CD56-HLA-DR+CD14+CD16-,Manual
+Intermediate_Monocytes,2021_dataset,CD19-CD3-CD56-HLA-DR+CD14+CD16+,Manual
+Non-Classical_Monocytes,2021_dataset,CD19-CD3-CD56-HLA-DR+CD14-CD16+,Manual
+"CD3-CD19-CD56-HLA-DR+CD14-CD16- cells",2021_dataset,CD19-CD3-CD56-HLA-DR+CD14-CD16-,Manual
+pDC,2021_dataset,CD19-CD3-CD56-HLA-DR+CD14-CD16-CD123+,Manual
+mDC,2021_dataset,CD19-CD3-CD56-HLA-DR+CD14-CD16-CD123-,Manual
+CD3-CD19-CD56-CD14-CD16-CD123-CD11c-HLA-DR+cells,2021_dataset,CD19-CD3-CD56-HLA-DR+CD14-CD16-CD123-CD11c-,Manual
+"Conventional dendritic cells (cDCs)",2021_dataset,CD19-CD3-CD56-HLA-DR+CD14-CD16-CD123-CD11c+,Manual
+cDC1,2021_dataset,CD19-CD3-CD56-HLA-DR+CD14-CD16-CD123-CD11c+CD1c-CD141+,Manual
+cDC2,2021_dataset,CD19-CD3-CD56-HLA-DR+CD14-CD16-CD123-CD11c+CD1c+CD141-,Manual
+CD3CD19,2021_dataset,CD19+CD3+,Manual
+"CD19+ CD3-",2021_dataset,CD19+CD3-,Manual
+"M:B doublets (CD19+CD14+)",2021_dataset,CD19+CD3-CD14+,Manual
+Bcells,2021_dataset,CD19+CD3-CD14-,Manual
+"B cells (CD19+CD3-CD14-CD56-)",2021_dataset,CD19+CD3-CD14-CD56-,Manual
+"B cells (CD19+CD20+CD3-CD14-CD56-)",2021_dataset,CD19+CD3-CD14-CD56-CD20+,Manual
+"Memory B cells",2021_dataset,CD19+CD3-CD14-CD56-IgD-CD71-,Manual
+"Naive B cells",2021_dataset,CD19+CD3-CD14-CD56-IgD+,Manual
+"Proliferating B cells",2021_dataset,CD19+CD3-CD14-CD56-IgD-CD71+,Manual
+"Activated B cells (ABCs)",2021_dataset,CD19+CD3-CD14-CD56-CD20-IgD-CD71+CD38+,Manual
+"ASCs (Plasmablasts)",2021_dataset,CD19+CD3-CD14-CD56-CD20+IgD-CD71+CD38+,Manual
+CD3CD19neg,2021_dataset,CD19-CD3+,Manual
+"CD3 Tcells",2021_dataset,CD19-CD3+CD14-CD56-,Manual
+CD4Tcells,2021_dataset,CD19-CD3+CD14-CD56-CD4+CD8-,Manual
+NaiveCD4,2021_dataset,CD19-CD3+CD14-CD56-CD4+CD8-CD45RA+CCR7+,Manual
+TcmCD4,2021_dataset,CD19-CD3+CD14-CD56-CD4+CD8-CD45RA-CCR7+,Manual
+TemraCD4,2021_dataset,CD19-CD3+CD14-CD56-CD4+CD8-CD45RA+CCR7-,Manual
+TemCD4,2021_dataset,CD19-CD3+CD14-CD56-CD4+CD8-CD45RA-CCR7-,Manual
+"CD4+CD8+ T cells",2021_dataset,CD19-CD3+CD14-CD56-CD4+CD8+,Manual
+"CD4-CD8- T cells",2021_dataset,CD19-CD3+CD14-CD56-CD4-CD8-,Manual
+CD8Tcells,2021_dataset,CD19-CD3+CD14-CD56-CD4-CD8+,Manual
+NaiveCD8,2021_dataset,CD19-CD3+CD14-CD56-CD4-CD8+CD45RA+CCR7+,Manual
+TcmCD8,2021_dataset,CD19-CD3+CD14-CD56-CD4-CD8+CD45RA-CCR7+,Manual
+TemCD8,2021_dataset,CD19-CD3+CD14-CD56-CD4-CD8+CD45RA-CCR7-,Manual
+TemraCD8,2021_dataset,CD19-CD3+CD14-CD56-CD4-CD8+CD45RA+CCR7-,Manual
+CD19-CD3-,2021_dataset,CD19-CD3-,Manual
+NK,2021_dataset,CD19-CD3-CD56+,Manual
+"Activated granulocytes",2021_dataset,CD19-CD3-CD56-HLA-DR-CD66b+,Manual
+Basophils,2021_dataset,CD19-CD3-CD56-HLA-DR-CD66b-CD123+,Manual
