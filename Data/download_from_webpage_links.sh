@@ -1,5 +1,6 @@
 # setting the output directory
-outdir="results/main/cmi_pb_datasets/raw/"
+outdir="raw/"
+mkdir -p $outdir
 
 # links are coming from: 
 # https://www.cmi-pb.org/mycmipb/2021_prediction_challenge/
@@ -9,43 +10,43 @@ outdir="results/main/cmi_pb_datasets/raw/"
 #########################################################################################
 
 # get subject data (status: good)
-wget --no-check-certificate -P  $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/2020LD_subject.csv
+wget --no-check-certificate -P  $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/04272022/2020LD_subject.csv
 
 # get specimen data (status: good)
-wget --no-check-certificate -P  $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/2020LD_specimen.csv
+wget --no-check-certificate -P  $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/04272022/2020LD_specimen.csv
 
 # get antibody titer data (status: good)
-wget --no-check-certificate -P  $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/2020LD_ab_titer.csv
+wget --no-check-certificate -P  $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/04272022/2020LD_ab_titer.csv
 
 # get rnaseq data (status: good)
-wget --no-check-certificate -P  $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/2020LD_rnaseq.csv
+wget --no-check-certificate -P  $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/04272022/2020LD_rnaseq.csv
 
 # get protein data (status: good)
-wget --no-check-certificate -P  $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/2020LD_olink_prot_exp.csv
+wget --no-check-certificate -P  $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/04272022/2020LD_olink_prot_exp.csv
 
 # get cell frequencies data (status: good)
-wget --no-check-certificate -P  $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/2020LD_live_cell_percentages.csv
+wget --no-check-certificate -P  $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/04272022/2020LD_live_cell_percentages.csv
 
 #########################################################################################
 # Download 2021 data ####################################################################
 #########################################################################################
 
 # get subject data (status: good)
-wget --no-check-certificate -P  $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/2021BD_subject.csv
+wget --no-check-certificate -P  $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/04272022/2021BD_subject.csv
 
 # get specimen data (status: good)
-wget --no-check-certificate -P  $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/2021BD_specimen.csv
+wget --no-check-certificate -P  $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/04272022/2021BD_specimen.csv
 
 # get antibody titer data (status: good)
-wget --no-check-certificate -P  $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/2021BD_ab_titer.csv
+wget --no-check-certificate -P  $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/04272022/2021BD_ab_titer.csv
 
 # get rnaseq data (status: good)
-wget --no-check-certificate -P  $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/2021BD_rnaseq.csv
+wget --no-check-certificate -P  $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/04272022/2021BD_rnaseq.csv
 
 # get protein data (status: good)
-wget --no-check-certificate -P  $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/2021BD_olink_prot_exp.csv
+wget --no-check-certificate -P  $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/04272022/2021BD_olink_prot_exp.csv
 
 # get cell frequencies data (status: good)
-wget --no-check-certificate -P  $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/2021BD_live_cell_percentages.csv
+wget --no-check-certificate -P  $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/04272022/2021BD_live_cell_percentages.csv
 
 
