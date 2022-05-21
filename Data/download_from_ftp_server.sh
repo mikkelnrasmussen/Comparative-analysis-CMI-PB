@@ -16,11 +16,11 @@ mkdir -p $outdir
 #2020LD_olink_prot_exp.csv
 #2020LD_rnaseq.csv
 
-wget -P $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/2020LD_subject.csv
-wget -P $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/2020LD_specimen.csv
-wget -P $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/2020LD_live_cell_percentages.csv
-wget -P $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/2020LD_olink_prot_exp.csv
-wget -P $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/2020LD_rnaseq.csv
+wget -P $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/04272022/2020LD_subject.csv --no-check-certificate
+wget -P $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/04272022/2020LD_specimen.csv --no-check-certificate
+wget -P $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/04272022/2020LD_live_cell_percentages.csv --no-check-certificate
+wget -P $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/04272022/2020LD_olink_prot_exp.csv --no-check-certificate
+wget -P $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/04272022/2020LD_rnaseq.csv --no-check-certificate
 
 #########################################################################################
 # Download 2021 data ####################################################################
@@ -31,9 +31,9 @@ wget -P $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_c
 #2021BD_olink_prot_exp.csv
 #2021BD_rnaseq.csv
 
-wget -P $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/2021BD_subject.csv
-wget -P $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/2021BD_specimen.csv
-wget -P $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/2021BD_live_cell_percentages.csv
-wget -P $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/2021BD_olink_prot_exp.csv
-wget -P $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/2021BD_rnaseq.csv
+wget -P $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/04272022/2021BD_subject.csv --no-check-certificate
+wget -P $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/04272022/2021BD_specimen.csv --no-check-certificate
+wget -P $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/04272022/2021BD_live_cell_percentages.csv --no-check-certificate
+wget -P $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/04272022/2021BD_olink_prot_exp.csv --no-check-certificate
+wget -P $outdir https://www.cmi-pb.org/downloads/cmipb_challenge_datasets/2021_cmipb_challenge/04272022/2021BD_rnaseq.csv --no-check-certificate
 
