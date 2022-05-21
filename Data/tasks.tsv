@@ -1,0 +1,11 @@
+assay	fullname	shortname	fetchname	day
+abtiters	IgG-PT	igg-pt	IgG-PT	14
+abtiters	IgG-FHA	igg-fha	IgG-FHA	14
+abtiters	IgG-PRN	igg-prn	IgG-PRN	14
+cytof	Monocytes	monocytes	Monocytes	1
+cytof	Plasmablasts	plasmablasts	ASCs (Plasmablasts)	7
+cytof	CD4Tcm	tcm-cd4	CD4Tcells	3
+rnaseq	CCL3	ccl3	ENSG00000277632	3
+rnaseq	IL-6	il6	ENSG00000136244	3
+rnaseq	NFKBIA	nfkbia	ENSG00000100906	7
+rnaseq	XIST	xist	ENSG00000229807	14
