@@ -200,7 +200,7 @@ df.TGSig.2020.pred.TPM <- geneSigCalc(gene.ex.data=ge.TPM.2020.day0.T,
 
 # Evaluate gene signature with TPM normalized gene expression
 Kotliarov.2020.TGSig.2020.results.TPM <- evaluateModel(df.prediction=df.TGSig.2020.pred.TPM,
-                                                       N.perm = 1000, direction = "<",
+                                                       N.perm = 10000, direction = "<",
                                                        add.to.title='- TPM normalized',
                                                        score.label = 'TGSig signature score',
                                                        fn1='TGSig_vs_day14_heatmap_TPM',
@@ -227,7 +227,7 @@ df.SLE.Sig.2020.pred.TPM <- geneSigCalc(gene.ex.data=ge.TPM.2020.day0.T,
 
 # Evaluate gene signature with TPM normalized gene expression
 Kotliarov.2020.SLE.Sig.2020.results.TPM <- evaluateModel(df.prediction=df.SLE.Sig.2020.pred.TPM,
-                                                         N.perm = 1000, direction = "<",
+                                                         N.perm = 10000, direction = "<",
                                                          add.to.title='- TPM normalized',
                                                          score.label = 'SLE-Sig signature score',
                                                          fn1='SLE-Sig_vs_day14_heatmap_TPM',
@@ -254,7 +254,7 @@ df.IFN.I.DCact.2020.pred.TPM <- geneSigCalc(gene.ex.data=ge.TPM.2020.day0.T,
 
 # Evaluate gene signature with TPM normalized gene expression
 Kotliarov.2020.IFN.I.DCact.2020.results.TPM <- evaluateModel(df.prediction=df.IFN.I.DCact.2020.pred.TPM,
-                                                             N.perm = 1000, direction = "<",
+                                                             N.perm = 10000, direction = "<",
                                                              add.to.title='- TPM normalized',
                                                              score.label = 'IFN-I-DCact signature score',
                                                              fn1='IFN-I-DCact_vs_day14_heatmap_TPM',
@@ -282,7 +282,7 @@ df.TGSig.2020.pred.DESEQ <- geneSigCalc(gene.ex.data=ge.norm.2020.day0,
 
 # Evaluate gene signature with DESeq2 normalized gene expression
 Kotliarov.2020.TGSig.2020.results.DESEQ <- evaluateModel(df.prediction=df.TGSig.2020.pred.DESEQ,
-                                                         N.perm = 1000, direction = "<",
+                                                         N.perm = 10000, direction = "<",
                                                          add.to.title='- DESeq2 VST normalized',
                                                          score.label = 'TGSig signature score',
                                                          fn1='TGSig_vs_day14_heatmap_DESEQ',
@@ -309,7 +309,7 @@ df.SLE.Sig.2020.pred.DESEQ <- geneSigCalc(gene.ex.data=ge.norm.2020.day0,
 
 # Evaluate gene signature with DESEQ normalized gene expression
 Kotliarov.2020.SLE.Sig.2020.results.DESEQ <- evaluateModel(df.prediction=df.SLE.Sig.2020.pred.DESEQ,
-                                                           N.perm = 1000, direction = "<",
+                                                           N.perm = 10000, direction = "<",
                                                            add.to.title='- DESeq2 VST normalized',
                                                            score.label = 'SLE-Sig signature score',
                                                            fn1='SLE-Sig_vs_day14_heatmap_DESEQ',
