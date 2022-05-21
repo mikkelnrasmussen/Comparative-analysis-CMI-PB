@@ -34,7 +34,7 @@ suppressMessages(library("readr"))
 suppressMessages(library("geneExpressionFromGEO"))
 
 # Load functions for evaluating gene signatures
-source('../../R/functions/geneModelEvaluate.R')
+source('../R/modelEvaluate.R')
 
 ```
 
