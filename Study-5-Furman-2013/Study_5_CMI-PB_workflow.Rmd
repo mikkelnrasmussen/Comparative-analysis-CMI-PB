@@ -29,7 +29,7 @@ suppressMessages(library('klaR'))
 suppressMessages(library("tibble"))
 
 # Load functions for evaluating gene signatures
-source('../../R/functions/geneModelEvaluate.R')
+source('../R/modelEvaluate.R')
 
 ```
 
@@ -98,7 +98,7 @@ df.age.2020.pred <- mlModelPredict(meta.data=meta.2020,
 
 # Evaluate age as a predictor
 Furman.2013.Age.2020.results <- evaluateModel(df.prediction=df.age.2020.pred,
-                                              N.perm = 1000, direction = ">",
+                                              N.perm = 10000, direction = ">",
                                               score.label = 'Age',
                                               fn1='Age_vs_day14_heatmap',
                                               fn2='Age_vs_day14_correlation',
