@@ -33,30 +33,31 @@ source('../../R/functions/geneModelEvaluate.R')
 
 ```
 
-#### Load the CMI-PB 2020 datasets
+#### Load the CMI-PB datasets
 
 ```{r load data}
 
-DATA_DIR <- "../../Data/Pre_process/cmi-pb-multiomics/results/main/cmi_pb_datasets/processed/full"
+DATA_DIR_raw <- "../Data/raw"
+DATA_DIR_full <- "../Data/processed/full"
 
 # Info table (meta data)
-meta.2020 <- fread(file.path(DATA_DIR, "meta.2020.pivoted.tsv.gz"))
-meta.2021 <- fread(file.path(DATA_DIR, "meta.2021.pivoted.tsv.gz"))
-specimen.table.2020 <- fread("../../Data/2021_cmipb_challenge/2020LD_specimen.csv")
-specimen.table.2021 <- fread("../../Data/2021_cmipb_challenge/2021BD_specimen.csv")
+meta.2020 <- fread(file.path(DATA_DIR_full, "meta.2020.pivoted.tsv"))
+meta.2021 <- fread(file.path(DATA_DIR_full, "meta.2021.pivoted.tsv"))
+specimen.table.2020 <- fread(file.path(DATA_DIR_raw, "2020LD_specimen.csv"))
+specimen.table.2021 <- fread(file.path(DATA_DIR_raw, "2021BD_specimen.csv"))
 
 # Antibody titer data
-ab.titer.2020 <- fread("../../Data/2021_cmipb_challenge/2020LD_ab_titer.csv")
-ab.titer.2021.day0 <- fread("../../Data/2021_cmipb_challenge/2021BD_ab_titer.csv")
-ab.titer.2021.day14 <- fread("../../Data/2021_cmipb_challenge/2021_ab_titer_day14.csv")
+ab.titer.2020 <- fread(file.path(DATA_DIR_raw, "2020LD_ab_titer.csv"))
+ab.titer.2021.day0 <- fread(file.path(DATA_DIR_raw, "2021BD_ab_titer.csv"))
+ab.titer.2021.day14 <- fread(file.path(DATA_DIR_raw, "../2021_ab_titer_day14.csv"))
 
-# Gene expression data for day 0
-ge.TPM.2020.day0 <- fread(file.path(DATA_DIR, "rnaseq_tpm.2020.day0.pivoted.tsv.gz"))
-ge.RAW.2020.day0 <- fread(file.path(DATA_DIR, "rnaseq_raw.2020.day0.pivoted.tsv.gz"))
+# Gene expression data for day 0  - 2020
+ge.TPM.2020.day0 <- fread(file.path(DATA_DIR_full, "rnaseq_tpm.2020.day0.pivoted.tsv"))
+ge.RAW.2020.day0 <- fread(file.path(DATA_DIR_full, "rnaseq_raw.2020.day0.pivoted.tsv"))
 
 # Gene expression data for day 0 - 2021
-ge.TPM.2021.day0 <- fread(file.path(DATA_DIR, "rnaseq_tpm.2021.day0.pivoted.tsv.gz"))
-ge.RAW.2021.day0 <- fread(file.path(DATA_DIR, "rnaseq_raw.2021.day0.pivoted.tsv.gz"))
+ge.TPM.2021.day0 <- fread(file.path(DATA_DIR_full, "rnaseq_tpm.2021.day0.pivoted.tsv"))
+ge.RAW.2021.day0 <- fread(file.path(DATA_DIR_full, "rnaseq_raw.2021.day0.pivoted.tsv"))
 
 ```
 
