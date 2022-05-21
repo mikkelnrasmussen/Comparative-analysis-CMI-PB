@@ -403,17 +403,17 @@ df.gene.sig.pred.2021 <- geneSigCalc(gene.ex.data=ge.norm.2021.day0,
 
 # Evaluate gene signature with DESeq normalized gene expression
 Avey.2017.gene.sig.2021.results <- evaluateModel(df.prediction=df.gene.sig.pred.2021, 
-                                            N.perm = 1000, direction = "<",
-                                            add.to.title='- DESeq2 VST normalized',
-                                            fn1='geneSig_vs_day14_heatmap',
-                                            fn2='geneSig_vs_day14_correlation',
-                                            fn3='geneSig_vs_FC_heatmap',
-                                            fn4='geneSig_vs_FC_correlation',
-                                            fn5='geneSig_vs_day14_AUC',
-                                            fn6='geneSig_vs_day14_boxplot',
-                                            fn7='geneSig_vs_FC_AUC',
-                                            fn8='geneSig_vs_FC_boxplot',
-                                            path='Results/2021/Gene_signature/')
+                                                 N.perm = 10000, direction = "<",
+                                                 add.to.title='- DESeq2 VST normalized',
+                                                 fn1='geneSig_vs_day14_heatmap',
+                                                 fn2='geneSig_vs_day14_correlation',
+                                                 fn3='geneSig_vs_FC_heatmap',
+                                                 fn4='geneSig_vs_FC_correlation',
+                                                 fn5='geneSig_vs_day14_AUC',
+                                                 fn6='geneSig_vs_day14_boxplot',
+                                                 fn7='geneSig_vs_FC_AUC',
+                                                 fn8='geneSig_vs_FC_boxplot',
+                                                 path='Results/2021/Gene_signature/')
 
 save(Avey.2017.gene.sig.2021.results, 
      file = "Results/2021/Gene_signature/Avey.2017.gene.sig.2021.results.RData")
@@ -434,7 +434,7 @@ df.module.M54.2021.pred <- geneModuleCalc(gene.ex.data=ge.norm.2021.day0,
 
 # Evaluate gene module intensity for the 'BCR signaling (M54)' module
 Avey.2017.module.M54.2021.results <- evaluateModel(df.prediction=df.module.M54.2021.pred, 
-                                                   N.perm = 1000, direction = "<",
+                                                   N.perm = 10000, direction = "<",
                                                    add.to.title='- DESeq2 VST normalized',
                                                    score.label='Gene module intensity (BCR signaling (M54))',
                                                    fn1='geneModule_M54_vs_day14_heatmap',
@@ -445,23 +445,23 @@ Avey.2017.module.M54.2021.results <- evaluateModel(df.prediction=df.module.M54.2
                                                    fn6='geneModule_M54_vs_day14_boxplot',
                                                    fn7='geneModule_M54_vs_FC_AUC',
                                                    fn8='geneModule_M54_vs_FC_boxplot',
-                                                   path = 'Results/2021/Gene_modules/M54/')
+                                                   path = 'Results/2021/M54/')
 
 save(Avey.2017.module.M54.2021.results, 
-     file = "Results/2021/Gene_modules/M54/Avey.2017.module.M54.2021.results.RData")
+     file = "Results/2021/M54/Avey.2017.module.M54.2021.results.RData")
 
 # Calculate gene module intensity for the 'platelet activation (III) (M42)' module
 df.module.M42.2021.pred <- geneModuleCalc(gene.ex.data=ge.norm.2021.day0, 
-                                     module='platelet activation (III) (M42)',
-                                     score='qusage',
-                                     post.ab.data=abt.2021.day14,
-                                     pre.ab.data=abt.2021.day0, 
-                                     filter.ab.ag=selected.iso.ag,
-                                     verbose=TRUE)
+                                          module='platelet activation (III) (M42)',
+                                          score='qusage',
+                                          post.ab.data=abt.2021.day14,
+                                          pre.ab.data=abt.2021.day0, 
+                                          filter.ab.ag=selected.iso.ag,
+                                          verbose=TRUE)
 
 # Evaluate gene module intensity for the 'platelet activation (III) (M42)' module
 Avey.2017.module.M42.2021.results <- evaluateModel(df.prediction=df.module.M42.2021.pred,
-                                                   N.perm = 1000, direction = "<",
+                                                   N.perm = 10000, direction = "<",
                                                    add.to.title='- DESeq2 VST normalized',
                                                    score.label='Gene module intensity (platelet activation (III) (M42))',
                                                    fn1='geneModule_M42_vs_day14_heatmap_DESEQ',
@@ -472,10 +472,10 @@ Avey.2017.module.M42.2021.results <- evaluateModel(df.prediction=df.module.M42.2
                                                    fn6='geneModule_M42_vs_day14_boxplot_DESEQ',
                                                    fn7='geneModule_M42_vs_FC_AUC_DESEQ',
                                                    fn8='geneModule_M42_vs_FC_boxplot_DESEQ',
-                                                   path = 'Results/2021/Gene_modules/M42/')
+                                                   path = 'Results/2021/M42/')
 
 save(Avey.2017.module.M42.2021.results, 
-     file = "Results/2021/Gene_modules/M42/Avey.2017.module.M42.2021.results.RData")
+     file = "Results/2021/M42/Avey.2017.module.M42.2021.results.RData")
 
 
 # Calculate gene module intensity for the 'inflammatory response (M33)' module
@@ -489,7 +489,7 @@ df.module.M33.2021.pred <- geneModuleCalc(gene.ex.data=ge.norm.2021.day0,
 
 # Evaluate gene module intensity for the 'inflammatory response (M33)' module
 Avey.2017.module.M33.2021.results <- evaluateModel(df.prediction=df.module.M33.2021.pred,
-                                                   N.perm = 1000, direction = "<",
+                                                   N.perm = 10000, direction = "<",
                                                    add.to.title='- DESeq2 VST normalized',
                                                    score.label='Gene module intensity (inflammatory response (M33))',
                                                    fn1='geneModule_M33_vs_day14_heatmap_DESEQ',
@@ -500,8 +500,8 @@ Avey.2017.module.M33.2021.results <- evaluateModel(df.prediction=df.module.M33.2
                                                    fn6='geneModule_M33_vs_day14_boxplot_DESEQ',
                                                    fn7='geneModule_M33_vs_FC_AUC_DESEQ',
                                                    fn8='geneModule_M33_vs_FC_boxplot_DESEQ',
-                                                   path = 'Results/2021/Gene_modules/M33/')
+                                                   path = 'Results/2021/M33/')
 
 save(Avey.2017.module.M33.2021.results, 
-     file = "Results/2021/Gene_modules/M33/Avey.2017.module.M33.2021.results.RData")
+     file = "Results/2021/M33/Avey.2017.module.M33.2021.results.RData")
 ```
