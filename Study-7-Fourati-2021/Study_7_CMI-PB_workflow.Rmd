@@ -166,11 +166,11 @@ Fourati.2021.RF.2020.results <- evaluateModel(df.prediction=df.RF.2020.pred,
                                               fn6='RFpred_vs_day14_boxplot_DESEQ',
                                               fn7='RFpred_vs_FC_AUC_DESEQ',
                                               fn8='RFpred_vs_FC_boxplot_DESEQ',
-                                              path = 'Results/2020/DESEQ/RF_model/')
+                                              path = 'Results/2020/RF_model/')
 
 # Save results
 save(Fourati.2021.RF.2020.results, 
-     file = "Results/2020/DESEQ/RF_model/Fourati.2021.RF.2020.results.RData")
+     file = "Results/2020/RF_model/Fourati.2021.RF.2020.results.RData")
 ```
 
 ## Step 5: Pre-process CMI-PB 2021 antibody titer data
@@ -297,7 +297,7 @@ df.RF.2021.pred <- mlModelPredict(gene.ex.data=normAllExprs.2021,
 
 # Evaluate model predictions 
 Fourati.2021.RF.2021.results <- evaluateModel(df.prediction=df.RF.2021.pred, 
-                                              N.perm = 1000, direction="<",
+                                              N.perm = 10000, direction="<",
                                               score.label = 'Class probability',
                                               fn1='RFpred_vs_day14_heatmap_DESEQ',
                                               fn2='RFpred_vs_day14_correlation_DESEQ ',
