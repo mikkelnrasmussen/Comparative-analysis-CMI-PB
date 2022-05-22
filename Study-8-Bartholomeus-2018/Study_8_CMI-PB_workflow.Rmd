@@ -94,13 +94,13 @@ abt.2020.day14 <- abt.2020.subset[abt.2020.subset$timepoint == 14, ]
 ```{r}
 
 # Load gene mapping 
-study.gene.map <- read.delim("../hepb_genexp/data/genes.txt", header = FALSE,
+study.gene.map <- read.delim("genes.txt", header = FALSE,
                        col.names = c('gene_id', 'ncbi_entrez', 'uniprot_id',
                                      'gene_symbol', 'protein', 'synonyms',
                                      'description', 'ncbi_id', 'start', 'end'))
 
 # Load differentially expressed genes
-deg.genes <- read.table("../hepb_genexp/DEG_output/R-vs-NR-EXP0.csv", sep = ",",
+deg.genes <- read.table("R-vs-NR-EXP0.csv", sep = ",",
                          header = TRUE) %>%
    dplyr::rename(id = X)
 
@@ -191,7 +191,7 @@ df.gene.sig.2020.pred <- geneSigCalc(gene.ex.data=ge.TPM.2020.day0.T,
 
 # Evaluate gene signature with TPM normalized gene expression
 Bartholomeus.2018.gene.sig.2020.results <- evaluateModel(df.prediction=df.gene.sig.2020.pred, 
-                                                         N.perm = 1000, direction = "missing",
+                                                         N.perm = 10000, direction = "missing",
                                                          add.to.title='- TPM normalized',
                                                          fn1='geneSig_vs_day14_heatmap_TPM',
                                                          fn2='geneSig_vs_day14_correlation_TPM',
@@ -212,8 +212,7 @@ save(Bartholomeus.2018.gene.sig.2020.results,
 
 ```{r}
 
-load("../hepb_genexp/predictor_scripts/classifier.RData")
-model1 <- readRDS("../hepb_genexp/predictor_scripts/model1_without_granulocytes.rds")
+model1 <- readRDS("model1_without_granulocytes.rds")
 
 # Calculate the class probability with the Naive Bayes classifier
 df.NB.2020.pred <- mlModelPredict(gene.ex.data=ge.RAW.2020.day0.T.norm, 
@@ -225,7 +224,7 @@ df.NB.2020.pred <- mlModelPredict(gene.ex.data=ge.RAW.2020.day0.T.norm,
 # Evaluate the class probability predicted by the Naive Bayes classifier
 Bartholomeus.2018.NB.2020.results <- evaluateModel(df.prediction=df.NB.2020.pred, 
                                                    direction='missing',
-                                                   N.perm = 1000,
+                                                   N.perm = 10000,
                                                    score.label='Differential genomic signature score',
                                                    fn1='NBpred_vs_day14_heatmap_TPM',
                                                    fn2='NBpred_vs_day14_correlation_TPM',
@@ -403,7 +402,7 @@ df.gene.sig.2021.pred <- geneSigCalc(gene.ex.data=ge.TPM.2021.day0.T,
 
 # Evaluate gene signature with TPM normalized gene expression
 Bartholomeus.2018.gene.sig.2021.results <- evaluateModel(df.prediction=df.gene.sig.2021.pred, 
-                                                         N.perm = 1000, direction = "missing",
+                                                         N.perm = 10000, direction = "missing",
                                                          add.to.title='- TPM normalized',
                                                          score.label='Differential genomic signature score',
                                                          fn1='geneSig_vs_day14_heatmap_TPM',
@@ -432,7 +431,7 @@ df.NB.2021.pred <- mlModelPredict(gene.ex.data=ge.RAW.2021.day0.T.norm,
 # Evaluate the class probability predicted by the Naive Bayes classifier
 Bartholomeus.2018.NB.2021.results <- evaluateModel(df.prediction=df.NB.2021.pred, 
                                                    direction='missing',
-                                                   N.perm = 1000,
+                                                   N.perm = 10000,
                                                    score.label='Class probability',
                                                    fn1='NBpred_vs_day14_heatmap',
                                                    fn2='NBpred_vs_day14_correlation',
