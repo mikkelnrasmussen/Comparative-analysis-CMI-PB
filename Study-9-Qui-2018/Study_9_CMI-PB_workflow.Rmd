@@ -180,7 +180,7 @@ Qui.2018.gene.sig.2020.results.TPM <- evaluateModel(df.prediction=df.ensembl.sig
                                                     fn6='ensemblSig_vs_day14_boxplot_TPM',
                                                     fn7='ensemblSig_vs_FC_AUC_TPM',
                                                     fn8='ensemblSig_vs_FC_boxplot_TPM',
-                                                    path = 'Results/2020/Gene_signature')
+                                                    path = 'Results/2020/Gene_signature/')
 
 # Save results
 save(Qui.2018.gene.sig.2020.results.TPM, 
