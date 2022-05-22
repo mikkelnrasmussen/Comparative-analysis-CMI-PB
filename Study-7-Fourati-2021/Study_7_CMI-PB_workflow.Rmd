@@ -118,6 +118,8 @@ norm.exprs.2020 <- assay(vsd)
 
 ```{r}
 
+# Download the `all_norm_eset.rds` file at https://www.immunespace.org/is2.url
+
 # Load the normalized expression matrix from the original study
 eset.target <- readRDS("all_norm_eset.rds")
 
@@ -154,7 +156,7 @@ df.RF.2020.pred <- mlModelPredict(gene.ex.data=normAllExprs.2020,
 
 # Evaluate model predictions 
 Fourati.2021.RF.2020.results <- evaluateModel(df.prediction=df.RF.2020.pred, 
-                                              N.perm = 1000, direction="<",
+                                              N.perm = 10000, direction="<",
                                               score.label = 'Class probability',
                                               fn1='RFpred_vs_day14_heatmap_DESEQ',
                                               fn2='RFpred_vs_day14_correlation_DESEQ ',
