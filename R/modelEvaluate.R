@@ -236,7 +236,7 @@ calculateBioAge <- function(ex.mat, gene.map, gene.synonym,
     supTable3aBin <- getBinaryURL(url = supTable3aPath, followlocation = TRUE) 
     
     # read Supplementary Table 3a
-    supTable3a2 <- read_csv(file = supTable3aBin, comment = "#")
+    supTable3a <- read_csv(file = supTable3aBin, comment = "#")
     
     # Filter genes in modules that do not have a gene symbol
     module2gene <- supTable3a %>%
