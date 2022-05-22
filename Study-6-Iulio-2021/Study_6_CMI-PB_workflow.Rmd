@@ -66,7 +66,7 @@ ge.RAW.2021.day0 <- fread(file.path(DATA_DIR_full, "rnaseq_raw.2021.day0.pivoted
 ```{r}
 
 # Load transfer signatures
-transfer.sig.table <- read_excel("../pnas.2022486118.sd01.xlsx",
+transfer.sig.table <- read_excel("pnas.2022486118.sd01.xlsx",
                                  sheet = "transfer signature gene lists")
 
 transfer.sig.list <- transfer.sig.table %>% 
@@ -166,7 +166,7 @@ for(study in selected.studies){
    
    # Evaluate transfer signatures
    tmp.results <- evaluateModel(df.prediction=predictions, direction='missing',
-                            N.perm = 1000,
+                            N.perm = 10000,
                             score.label='Gene signature score',
                             add.to.title=paste(" - ", study),
                             fn1='transferSig_vs_day14_heatmap',
