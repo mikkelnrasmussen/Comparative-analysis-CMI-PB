@@ -41,3 +41,7 @@ vignettes/*.pdf
 # Data folder
 Data/raw/
 Data/processed/
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/
