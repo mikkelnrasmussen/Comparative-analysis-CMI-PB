@@ -22,7 +22,6 @@ suppressMessages(library("lubridate"))
 
 ```
 
-
 ## Load results from all of the prediction methods evaluate on the CMI-PB 2020 dataset
 
 ```{r}
