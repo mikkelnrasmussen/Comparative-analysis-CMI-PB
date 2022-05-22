@@ -162,7 +162,7 @@ df.age.pred.2021 <- mlModelPredict(meta.data=meta.2021.subset,
                                    study='Furman_2013')
 
 # Read submisson format
-submission.format <- fread("../../Data/2021_cmipb_challenge/2021_submission_format.tsv") %>% 
+submission.format <- fread("../Data/2021_submission_format.tsv") %>% 
    dplyr::rename(subject_id = Subject_ID)
 
 # Age predictions
