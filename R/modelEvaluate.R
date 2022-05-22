@@ -813,7 +813,6 @@ mlModelPredict <- function(gene.ex.data=NULL, model, study, post.ab.data=NULL,
       # probe.gene.map <- fData(eset)
       probe.gene.map <- read_excel("supplementary_table_4a.xlsx")
       
-      
       # The 15-gene signature used as input
       print(names(model$"tables"))
       genes.mat <- probe.gene.map[match(names(model$"tables"),
