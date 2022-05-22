@@ -104,10 +104,10 @@ ge.TPM.2020.day0.T <- ge.TPM.2020.day0 %>%
 ```{r}
 
 # Obtain the probe set IDs and gene symbol annotations from the original study
-df.genes.up <- read_excel("../khvi_a_1450122_sm5896.xlsx", range = "A5:F61",
+df.genes.up <- read_excel("khvi_a_1450122_sm5896.xlsx", range = "A5:F61",
                           col_names = c("ProbeSetID", "Annotations", "RefSeq",
                                         "Fold Change", "P-value", "locus_type"))
-df.genes.down <- read_excel("../khvi_a_1450122_sm5896.xlsx", range = "A66:F80",
+df.genes.down <- read_excel("khvi_a_1450122_sm5896.xlsx", range = "A66:F80",
                             col_names = c("ProbeSetID", "Annotations", "RefSeq",
                                         "Fold Change", "P-value", "locus_type"))
 
@@ -169,7 +169,7 @@ df.ensembl.sig.2020.pred.TPM <- geneSigCalc(gene.ex.data=ge.TPM.2020.day0.T,
 
 # Evaluate gene signature with TPM normalized gene expression
 Qui.2018.gene.sig.2020.results.TPM <- evaluateModel(df.prediction=df.ensembl.sig.2020.pred.TPM,
-                                                    N.perm = 1000, direction="missing",
+                                                    N.perm = 10000, direction="missing",
                                                     add.to.title='- TPM normalized',
                                                     score.label='Differential genomic signature score',
                                                     fn1='ensemblSig_vs_day14_heatmap_TPM',
@@ -180,11 +180,11 @@ Qui.2018.gene.sig.2020.results.TPM <- evaluateModel(df.prediction=df.ensembl.sig
                                                     fn6='ensemblSig_vs_day14_boxplot_TPM',
                                                     fn7='ensemblSig_vs_FC_AUC_TPM',
                                                     fn8='ensemblSig_vs_FC_boxplot_TPM',
-                                                    path = 'Results/2020/TPM/EnsemblSig/')
+                                                    path = 'Results/2020/Gene_signature')
 
 # Save results
 save(Qui.2018.gene.sig.2020.results.TPM, 
-     file = "Results/2020/TPM/EnsemblSig/Qui.2018.gene.sig.2020.results.TPM.RData")
+     file = "Results/2020/Gene_signature/Qui.2018.gene.sig.2020.results.TPM.RData")
 
 
 ```
@@ -284,7 +284,7 @@ df.gene.sig.2021.pred <- geneSigCalc(gene.ex.data=ge.TPM.2021.day0.T,
 
 # Evaluate gene signature with TPM normalized gene expression
 Qui.2018.gene.sig.2021.results <- evaluateModel(df.prediction=df.gene.sig.2021.pred,
-                                                N.perm = 1000, direction="missing",
+                                                N.perm = 10000, direction="missing",
                                                 add.to.title='- TPM normalized',
                                                 score.label='Differential genomic signature score',
                                                 fn1='ensemblSig_vs_day14_heatmap',
@@ -295,10 +295,10 @@ Qui.2018.gene.sig.2021.results <- evaluateModel(df.prediction=df.gene.sig.2021.p
                                                 fn6='ensemblSig_vs_day14_boxplot',
                                                 fn7='ensemblSig_vs_FC_AUC',
                                                 fn8='ensemblSig_vs_FC_boxplot',
-                                                path = 'Results/2021/EnsemblSig/')
+                                                path = 'Results/2021/Gene_signature/')
 
 # Save results
 save(Qui.2018.gene.sig.2021.results, 
-     file = "Results/2021/EnsemblSig/Qui.2018.gene.sig.2021.results.RData")
+     file = "Results/2021/Gene_signature/Qui.2018.gene.sig.2021.results.RData")
 ```
 
