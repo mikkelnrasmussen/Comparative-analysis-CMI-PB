@@ -173,12 +173,9 @@ df.BioAge.2020.pred.TPM <- geneModuleCalc(gene.ex.data=ge.TPM.2020.day0.T,
                                           pre.ab.data=abt.2020.day0,
                                           filter.ab.ag=selected.iso.ag)
 
-df.BioAge.2020.pred.TPM <- df.BioAge.2020.pred.TPM %>% 
-   dplyr::mutate(titer.class = ifelse(titer.class == 1, 0, 1))
-
 # Evaluate gene signature with TPM normalized gene expression
 Fourati.2015.BioAge.2020.results.TPM <- evaluateModel(df.prediction=df.BioAge.2020.pred.TPM,
-                                                      N.perm = 1000, direction = "<",
+                                                      N.perm = 10000, direction = "<",
                                                       add.to.title='- TPM normalized',
                                                       save.plot = FALSE,
                                                       score.label = 'BioAge score',
@@ -206,7 +203,7 @@ df.BioAge.2020.pred.DESEQ <- geneModuleCalc(gene.ex.data=ge.norm.2020.day0,
 
 # Evaluate gene signature with DESeq2 normalized gene expression
 Fourati.2015.BioAge.2020.results.DESEQ <- evaluateModel(df.prediction=df.BioAge.2020.pred.DESEQ,
-                                                        N.perm = 1000, direction = "missing",
+                                                        N.perm = 10000, direction = "missing",
                                                         add.to.title='- DESeq2 VST normalized',
                                                         score.label = 'BioAge score',
                                                         fn1='BioAge_vs_day14_heatmap_DESEQ',
@@ -240,7 +237,7 @@ df.M1.2020.pred.TPM <- geneModuleCalc(gene.ex.data=ge.TPM.2020.day0.T,
 
 # Evaluate M1 M1 score with TPM normalized gene expression
 Fourati.2015.M1.2020.results.TPM <- evaluateModel(df.prediction=df.M1.2020.pred.TPM,
-                                                  N.perm = 1000, direction = "missing",
+                                                  N.perm = 10000, direction = "missing",
                                                   add.to.title='- TPM normalized',
                                                   score.label = 'M1 BioAge score',
                                                   fn1='M1BioAge_vs_day14_heatmap_TPM',
@@ -268,7 +265,7 @@ df.M1.M16.2020.pred.TPM <- geneModuleCalc(gene.ex.data=ge.TPM.2020.day0.T,
 
 # Evaluate M1+M16 BioAge score with TPM normalized gene expression
 Fourati.2015.M1.M16.2020.results.TPM <- evaluateModel(df.prediction=df.M1.M16.2020.pred.TPM,
-                                                      N.perm = 1000, direction = "missing",
+                                                      N.perm = 10000, direction = "missing",
                                                       add.to.title='- TPM normalized',
                                                       score.label = 'M1+M16 BioAge score',
                                                       fn1='M1M16BioAge_vs_day14_heatmap_TPM',
@@ -296,7 +293,7 @@ df.M1.2020.pred.DESEQ <- geneModuleCalc(gene.ex.data=ge.norm.2020.day0,
 
 # Evaluate M1 BioAge score with DESeq2 normalized gene expression
 Fourati.2015.M1.2020.results.DESEQ <- evaluateModel(df.prediction=df.M1.2020.pred.DESEQ,
-                                                    N.perm = 1000, direction = "missing",
+                                                    N.perm = 10000, direction = "missing",
                                                     add.to.title='- DESeq2 VST normalized',
                                                     score.label = 'M1 BioAge score',
                                                     fn1='M1BioAge_vs_day14_heatmap_DESEQ',
@@ -324,7 +321,7 @@ df.M1.M16.2020.pred.DESEQ <- geneModuleCalc(gene.ex.data=ge.norm.2020.day0,
 
 # Evaluate M1+M16 BioAge score with DESeq2 normalized gene expression
 Fourati.2015.M1.M16.2020.results.DESEQ <- evaluateModel(df.prediction=df.M1.M16.2020.pred.DESEQ,
-                                                        N.perm = 1000, direction = "missing",
+                                                        N.perm = 10000, direction = "missing",
                                                         add.to.title='- DESeq2 VST normalized',
                                                         score.label = 'M1+M16 BioAge score',
                                                         fn1='M1M16BioAge_vs_day14_heatmap_DESEQ',
@@ -348,7 +345,7 @@ save(Fourati.2015.M1.M16.2020.results.DESEQ,
 ```{r}
 
 # Load Naive Bayes classifier
-load(file='../CMI-PB/em131.naiveBayes.RData')
+load(file='em131.naiveBayes.RData')
 NB.fit <- fit
 
 ################ TPM normalized gene expression ###############
@@ -362,7 +359,7 @@ df.NB.2020.pred.TPM <- mlModelPredict(gene.ex.data=ge.TPM.2020.day0.T,
 
 # Evaluate gene signature with TPM normalized gene expression
 Fourati.2015.NB.2020.results.TPM <- evaluateModel(df.prediction=df.NB.2020.pred.TPM,
-                                                  N.perm = 1000, direction = "missing",
+                                                  N.perm = 10000, direction = "missing",
                                                   add.to.title='- TPM normalized',
                                                   score.label = 'Ratio between post-probalities',
                                                   fn1='NBpred_vs_day14_heatmap',
@@ -390,7 +387,7 @@ df.NB.2020.pred.DESEQ <- mlModelPredict(gene.ex.data=ge.norm.2020.day0,
 
 # Evaluate gene signature with DESeq2 normalized gene expression
 Fourati.2015.NB.2020.results.DESEQ <- evaluateModel(df.prediction=df.NB.2020.pred.DESEQ,
-                                                    N.perm = 1000, direction = "missing",
+                                                    N.perm = 10000, direction = "missing",
                                                     add.to.title='- DESeq2 VST normalized',
                                                     score.label = 'Ratio between post-probalities',
                                                     fn1='NBpred_vs_day14_heatmap',
@@ -443,7 +440,7 @@ cell.types.2020[cell.types.2020$cell_type_name == 'pDC', ]$gating_definition
 cell.populations.2020 <- c("Bcells", 'ASCs (Plasmablasts)', "TemCD4", "pDC")
 
 # Load logistic regression model
-load(file='../CMI-PB/em131.logisticReg.RData')
+load(file='em131.logisticReg.RData')
 LR.fit <- fit
 
 # Calculate the output of the logistic regression model with 4 cell populations
@@ -457,7 +454,7 @@ df.LR.2020.pred <- mlModelPredict(cytof.data=cytof.2020.day0,
 
 # Evaluate the logistic regression model with 4 cell populations
 Fourati.2015.LR.2020.results <- evaluateModel(df.prediction=df.LR.2020.pred, 
-                                              direction = 'missing', N.perm = 1000,
+                                              direction = 'missing', N.perm = 10000,
                                               score.label='LR output - scale of the linear predictors',
                                               add.to.title = " - Logistic regression using cell populations",
                                               fn1='LRpred_vs_day14_heatmap',
@@ -599,8 +596,7 @@ cell.populations.2021 <- c("Bcells", "Memory B cells", "TemCD4", "pDC")
 
 # Calculate the BioAge score with DESeq2 normalized gene expression
 df.BioAge.pred.2021 <- geneModuleCalc(gene.ex.data=ge.norm.2021.day0, 
-                                      score='bioage',
-                                      verbose=TRUE)
+                                      score='bioage')
 
 
 # Calculate the M1 BioAge score with DESeq2 normalized gene expression
@@ -704,7 +700,7 @@ df.BioAge.2021.pred <- geneModuleCalc(gene.ex.data=ge.norm.2021.day0,
 
 # Evaluate gene signature with DESeq2 normalized gene expression
 Fourati.2015.BioAge.2021.results <- evaluateModel(df.prediction=df.BioAge.2021.pred,
-                                                  N.perm = 1000, direction = "missing",
+                                                  N.perm = 10000, direction = "missing",
                                                   add.to.title='- DESeq2 VST normalized',
                                                   score.label = 'BioAge score',
                                                   fn1='BioAge_vs_day14_heatmap',
@@ -732,7 +728,7 @@ df.M1.2021.pred <- geneModuleCalc(gene.ex.data=ge.norm.2021.day0,
 
 # Evaluate M1 BioAge score with DESeq2 normalized gene expression
 Fourati.2015.M1.2021.results <- evaluateModel(df.prediction=df.M1.2021.pred,
-                                              N.perm = 1000, direction = "missing",
+                                              N.perm = 10000, direction = "missing",
                                               add.to.title='- DESeq2 VST normalized',
                                               score.label = 'M1 BioAge score',
                                               fn1='M1BioAge_vs_day14_heatmap',
@@ -759,7 +755,7 @@ df.M1.M16.2021.pred <- geneModuleCalc(gene.ex.data=ge.norm.2021.day0,
 
 # Evaluate M1+M16 BioAge score with DESeq2 normalized gene expression
 Fourati.2015.M1.M16.2021.results <- evaluateModel(df.prediction=df.M1.M16.2021.pred,
-                                                  N.perm = 1000, direction = "missing",
+                                                  N.perm = 10000, direction = "missing",
                                                   add.to.title='- DESeq2 VST normalized',
                                                   score.label = 'M1+M16 BioAge score',
                                                   fn1='M1M16BioAge_vs_day14_heatmap',
@@ -787,7 +783,7 @@ df.NB.2021.pred <- mlModelPredict(gene.ex.data=ge.norm.2021.day0,
 
 # Evaluate gene signature with DESeq2 normalized gene expression
 Fourati.2015.NB.2021.results <- evaluateModel(df.prediction=df.NB.2021.pred,
-                                              N.perm = 1000, direction = "missing",
+                                              N.perm = 10000, direction = "missing",
                                               add.to.title='- DESeq2 VST normalized',
                                               score.label = 'Ratio between post-probalities',
                                               fn1='NBpred_vs_day14_heatmap',
@@ -817,7 +813,7 @@ df.LR.2021.pred <- mlModelPredict(cytof.data=cytof.2021.day0,
 
 # Evaluate the logistic regression model with 4 cell populations
 Fourati.2015.LR.2021.results <- evaluateModel(df.prediction=df.LR.2021.pred, 
-                                              direction = 'missing', N.perm = 1000,
+                                              direction = 'missing', N.perm = 10000,
                                               score.label='LR output - scale of the linear predictors',
                                               add.to.title = " - Logistic regression using cell populations",
                                               fn1='LRpred_vs_day14_heatmap',
