@@ -794,7 +794,7 @@ mlModelPredict <- function(gene.ex.data=NULL, model, study, post.ab.data=NULL,
    pred$predictor <- as.numeric(pred$predictor)
       
       
-   } else if(study == 'fourati_2015_NB'){
+   } else if(study == 'fourati_2016_NB'){
       
       ### Download and load EM131 ExpressionSet (cf. Fig. 2)
       esetPath <- file.path("https://storage.googleapis.com/em131_20120924",
@@ -856,7 +856,7 @@ mlModelPredict <- function(gene.ex.data=NULL, model, study, post.ab.data=NULL,
                         predictor = pred)
       pred$predictor <- as.numeric(pred$predictor)
       
-   } else if(study =='fourati_2015_LR'){
+   } else if(study =='fourati_2016_LR'){
       
       # Subset cell frequnecy data to the selected populations
       df.cells <- cytof.data[cytof.data$cell_type_name %in% populations, ] %>% 
