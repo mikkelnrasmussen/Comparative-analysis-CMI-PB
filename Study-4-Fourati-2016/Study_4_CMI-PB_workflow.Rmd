@@ -174,10 +174,9 @@ df.BioAge.2020.pred.TPM <- geneModuleCalc(gene.ex.data=ge.TPM.2020.day0.T,
                                           filter.ab.ag=selected.iso.ag)
 
 # Evaluate gene signature with TPM normalized gene expression
-Fourati.2015.BioAge.2020.results.TPM <- evaluateModel(df.prediction=df.BioAge.2020.pred.TPM,
+Fourati.2016.BioAge.2020.results.TPM <- evaluateModel(df.prediction=df.BioAge.2020.pred.TPM,
                                                       N.perm = 10000, direction = "<",
                                                       add.to.title='- TPM normalized',
-                                                      save.plot = FALSE,
                                                       score.label = 'BioAge score',
                                                       fn1='BioAge_vs_day14_heatmap_TPM',
                                                       fn2='BioAge_vs_day14_correlation_TPM ',
@@ -190,8 +189,8 @@ Fourati.2015.BioAge.2020.results.TPM <- evaluateModel(df.prediction=df.BioAge.20
                                                       path = 'Results/2020/TPM/BioAge/')
 
 # Save results
-save(Fourati.2015.BioAge.2020.results.TPM, 
-     file = "Results/2020/TPM/BioAge/Fourati.2015.BioAge.2020.results.TPM.RData")
+save(Fourati.2016.BioAge.2020.results.TPM, 
+     file = "Results/2020/TPM/BioAge/Fourati.2016.BioAge.2020.results.TPM.RData")
 
 ################ DESEQ normalized gene expression ###############
 # Calculate the gene signature score with DESeq2 normalized gene expression
@@ -202,7 +201,7 @@ df.BioAge.2020.pred.DESEQ <- geneModuleCalc(gene.ex.data=ge.norm.2020.day0,
                                             filter.ab.ag=selected.iso.ag)
 
 # Evaluate gene signature with DESeq2 normalized gene expression
-Fourati.2015.BioAge.2020.results.DESEQ <- evaluateModel(df.prediction=df.BioAge.2020.pred.DESEQ,
+Fourati.2016.BioAge.2020.results.DESEQ <- evaluateModel(df.prediction=df.BioAge.2020.pred.DESEQ,
                                                         N.perm = 10000, direction = "missing",
                                                         add.to.title='- DESeq2 VST normalized',
                                                         score.label = 'BioAge score',
@@ -217,8 +216,8 @@ Fourati.2015.BioAge.2020.results.DESEQ <- evaluateModel(df.prediction=df.BioAge.
                                                         path='Results/2020/DESEQ/BioAge/')
 
 # Save results
-save(Fourati.2015.BioAge.2020.results.DESEQ, 
-     file = "Results/2020/DESEQ/BioAge/Fourati.2015.BioAge.2020.results.DESEQ.RData")
+save(Fourati.2016.BioAge.2020.results.DESEQ, 
+     file = "Results/2020/DESEQ/BioAge/Fourati.2016.BioAge.2020.results.DESEQ.RData")
 ```
 
 ## Step 5: Evaluate the predictive power of the module M1 and M16 used in the BioAge 
@@ -236,7 +235,7 @@ df.M1.2020.pred.TPM <- geneModuleCalc(gene.ex.data=ge.TPM.2020.day0.T,
                                       filter.ab.ag=selected.iso.ag)
 
 # Evaluate M1 M1 score with TPM normalized gene expression
-Fourati.2015.M1.2020.results.TPM <- evaluateModel(df.prediction=df.M1.2020.pred.TPM,
+Fourati.2016.M1.2020.results.TPM <- evaluateModel(df.prediction=df.M1.2020.pred.TPM,
                                                   N.perm = 10000, direction = "missing",
                                                   add.to.title='- TPM normalized',
                                                   score.label = 'M1 BioAge score',
@@ -251,8 +250,8 @@ Fourati.2015.M1.2020.results.TPM <- evaluateModel(df.prediction=df.M1.2020.pred.
                                                   path = 'Results/2020/TPM/M1/')
 
 # Save results
-save(Fourati.2015.M1.2020.results.TPM, 
-     file = "Results/2020/TPM/M1/Fourati.2015.M1.2020.results.TPM.RData")
+save(Fourati.2016.M1.2020.results.TPM, 
+     file = "Results/2020/TPM/M1/Fourati.2016.M1.2020.results.TPM.RData")
 
 # Evaluate the predictive power of module M1 and M16 together
 # Calculate the M1+M16 BioAge score with TPM normalized gene expression
@@ -264,7 +263,7 @@ df.M1.M16.2020.pred.TPM <- geneModuleCalc(gene.ex.data=ge.TPM.2020.day0.T,
                                      filter.ab.ag=selected.iso.ag)
 
 # Evaluate M1+M16 BioAge score with TPM normalized gene expression
-Fourati.2015.M1.M16.2020.results.TPM <- evaluateModel(df.prediction=df.M1.M16.2020.pred.TPM,
+Fourati.2016.M1.M16.2020.results.TPM <- evaluateModel(df.prediction=df.M1.M16.2020.pred.TPM,
                                                       N.perm = 10000, direction = "missing",
                                                       add.to.title='- TPM normalized',
                                                       score.label = 'M1+M16 BioAge score',
@@ -279,8 +278,8 @@ Fourati.2015.M1.M16.2020.results.TPM <- evaluateModel(df.prediction=df.M1.M16.20
                                                       path = 'Results/2020/TPM/M1+M16/')
 
 # Save results
-save(Fourati.2015.M1.M16.2020.results.TPM, 
-     file = "Results/2020/TPM/M1+M16/Fourati.2015.M1.M16.2020.results.TPM.RData")
+save(Fourati.2016.M1.M16.2020.results.TPM, 
+     file = "Results/2020/TPM/M1+M16/Fourati.2016.M1.M16.2020.results.TPM.RData")
 
 ################ DESEQ normalized gene expression ###############
 # Calculate the M1 BioAge score with DESeq2 normalized gene expression
@@ -292,7 +291,7 @@ df.M1.2020.pred.DESEQ <- geneModuleCalc(gene.ex.data=ge.norm.2020.day0,
                                         filter.ab.ag=selected.iso.ag)
 
 # Evaluate M1 BioAge score with DESeq2 normalized gene expression
-Fourati.2015.M1.2020.results.DESEQ <- evaluateModel(df.prediction=df.M1.2020.pred.DESEQ,
+Fourati.2016.M1.2020.results.DESEQ <- evaluateModel(df.prediction=df.M1.2020.pred.DESEQ,
                                                     N.perm = 10000, direction = "missing",
                                                     add.to.title='- DESeq2 VST normalized',
                                                     score.label = 'M1 BioAge score',
@@ -307,8 +306,8 @@ Fourati.2015.M1.2020.results.DESEQ <- evaluateModel(df.prediction=df.M1.2020.pre
                                                     path = 'Results/2020/DESEQ/M1/')
 
 # Save results
-save(Fourati.2015.M1.2020.results.DESEQ, 
-     file = "Results/2020/DESEQ/M1/Fourati.2015.M1.2020.results.DESEQ.RData")
+save(Fourati.2016.M1.2020.results.DESEQ, 
+     file = "Results/2020/DESEQ/M1/Fourati.2016.M1.2020.results.DESEQ.RData")
 
 # Evaluate the predictive power of module M1 and M16 together
 # Calculate the M1+M16 BioAge score with DESeq2 normalized gene expression
@@ -320,7 +319,7 @@ df.M1.M16.2020.pred.DESEQ <- geneModuleCalc(gene.ex.data=ge.norm.2020.day0,
                                             filter.ab.ag=selected.iso.ag)
 
 # Evaluate M1+M16 BioAge score with DESeq2 normalized gene expression
-Fourati.2015.M1.M16.2020.results.DESEQ <- evaluateModel(df.prediction=df.M1.M16.2020.pred.DESEQ,
+Fourati.2016.M1.M16.2020.results.DESEQ <- evaluateModel(df.prediction=df.M1.M16.2020.pred.DESEQ,
                                                         N.perm = 10000, direction = "missing",
                                                         add.to.title='- DESeq2 VST normalized',
                                                         score.label = 'M1+M16 BioAge score',
@@ -335,8 +334,8 @@ Fourati.2015.M1.M16.2020.results.DESEQ <- evaluateModel(df.prediction=df.M1.M16.
                                                         path = 'Results/2020/DESEQ/M1+M16/')
 
 # Save results
-save(Fourati.2015.M1.M16.2020.results.DESEQ, 
-     file = "Results/2020/DESEQ/M1+M16/Fourati.2015.M1.M16.2020.results.DESEQ.RData")
+save(Fourati.2016.M1.M16.2020.results.DESEQ, 
+     file = "Results/2020/DESEQ/M1+M16/Fourati.2016.M1.M16.2020.results.DESEQ.RData")
 
 ```
 
@@ -351,14 +350,14 @@ NB.fit <- fit
 ################ TPM normalized gene expression ###############
 # Calculate the gene signature score with DESeq2 normalized gene expression
 df.NB.2020.pred.TPM <- mlModelPredict(gene.ex.data=ge.TPM.2020.day0.T,
-                                      model=NB.fit, study='fourati_2015_NB',
+                                      model=NB.fit, study='fourati_2016_NB',
                                       post.ab.data=abt.2020.day14, 
                                       pre.ab.data=abt.2020.day0,
                                       filter.ab.ag=selected.iso.ag, 
                                       verbose=TRUE)
 
 # Evaluate gene signature with TPM normalized gene expression
-Fourati.2015.NB.2020.results.TPM <- evaluateModel(df.prediction=df.NB.2020.pred.TPM,
+Fourati.2016.NB.2020.results.TPM <- evaluateModel(df.prediction=df.NB.2020.pred.TPM,
                                                   N.perm = 10000, direction = "missing",
                                                   add.to.title='- TPM normalized',
                                                   score.label = 'Ratio between post-probalities',
@@ -373,20 +372,20 @@ Fourati.2015.NB.2020.results.TPM <- evaluateModel(df.prediction=df.NB.2020.pred.
                                                   path='Results/2020/TPM/Naive_bayes/')
 
 # Save results
-save(Fourati.2015.NB.2020.results.TPM, 
-     file = "Results/2020/TPM/Naive_bayes/Fourati.2015.NB.2020.results.TPM.RData")
+save(Fourati.2016.NB.2020.results.TPM, 
+     file = "Results/2020/TPM/Naive_bayes/Fourati.2016.NB.2020.results.TPM.RData")
 
 ################ DESEQ normalized gene expression ###############
 # Calculate the gene signature score with DESeq2 normalized gene expression
 df.NB.2020.pred.DESEQ <- mlModelPredict(gene.ex.data=ge.norm.2020.day0,
-                                        model=NB.fit, study='fourati_2015_NB',
+                                        model=NB.fit, study='fourati_2016_NB',
                                         post.ab.data=abt.2020.day14, 
                                         pre.ab.data=abt.2020.day0,
                                         filter.ab.ag=selected.iso.ag, 
                                         verbose=TRUE)
 
 # Evaluate gene signature with DESeq2 normalized gene expression
-Fourati.2015.NB.2020.results.DESEQ <- evaluateModel(df.prediction=df.NB.2020.pred.DESEQ,
+Fourati.2016.NB.2020.results.DESEQ <- evaluateModel(df.prediction=df.NB.2020.pred.DESEQ,
                                                     N.perm = 10000, direction = "missing",
                                                     add.to.title='- DESeq2 VST normalized',
                                                     score.label = 'Ratio between post-probalities',
@@ -401,8 +400,8 @@ Fourati.2015.NB.2020.results.DESEQ <- evaluateModel(df.prediction=df.NB.2020.pre
                                                     path='Results/2020/DESEQ/Naive_bayes/')
 
 # Save results
-save(Fourati.2015.NB.2020.results.DESEQ, 
-     file = "Results/2020/DESEQ/Naive_bayes/Fourati.2015.NB.2020.results.DESEQ.RData")
+save(Fourati.2016.NB.2020.results.DESEQ, 
+     file = "Results/2020/DESEQ/Naive_bayes/Fourati.2016.NB.2020.results.DESEQ.RData")
 
 ```
 
@@ -446,14 +445,14 @@ LR.fit <- fit
 # Calculate the output of the logistic regression model with 4 cell populations
 df.LR.2020.pred <- mlModelPredict(cytof.data=cytof.2020.day0,
                                   populations=cell.populations.2020,
-                                  study='fourati_2015_LR', 
+                                  study='fourati_2016_LR', 
                                   model=LR.fit, year="2020",
                                   filter.ab.ag=selected.iso.ag,
                                   post.ab.data=abt.2020.day14,
                                   pre.ab.data=abt.2020.day0)
 
 # Evaluate the logistic regression model with 4 cell populations
-Fourati.2015.LR.2020.results <- evaluateModel(df.prediction=df.LR.2020.pred, 
+Fourati.2016.LR.2020.results <- evaluateModel(df.prediction=df.LR.2020.pred, 
                                               direction = 'missing', N.perm = 10000,
                                               score.label='LR output - scale of the linear predictors',
                                               add.to.title = " - Logistic regression using cell populations",
@@ -468,8 +467,8 @@ Fourati.2015.LR.2020.results <- evaluateModel(df.prediction=df.LR.2020.pred,
                                               path = 'Results/2020/LR/')
 
 # Save results
-save(Fourati.2015.LR.2020.results, 
-     file = "Results/2020/LR/Fourati.2015.LR.2020.results.RData")
+save(Fourati.2016.LR.2020.results, 
+     file = "Results/2020/LR/Fourati.2016.LR.2020.results.RData")
 
 ```
 
@@ -612,13 +611,13 @@ df.M1.M16.pred.2021 <- geneModuleCalc(gene.ex.data=ge.norm.2021.day0,
 
 # Calculate the gene signature score with DESeq2 normalized gene expression
 df.NB.pred.2021 <- mlModelPredict(gene.ex.data=ge.norm.2021.day0,
-                                   model=NB.fit, study='fourati_2015_NB',
+                                   model=NB.fit, study='fourati_2016_NB',
                                    verbose=TRUE)
 
 # Calculate the output of the logistic regression model with 4 cell populations
 df.LR.pred.2021 <- mlModelPredict(cytof.data=cytof.2021.day0,
                                   populations=cell.populations.2021,
-                                  study='fourati_2015_LR', 
+                                  study='fourati_2016_LR', 
                                   model=LR.fit,
                                   year="2021")
 
@@ -628,59 +627,59 @@ submission.format <- fread("../Data/2021_submission_format.tsv") %>%
    dplyr::rename(subject_id = Subject_ID)
 
 # BioAge predictions
-Fourati.2015.BioAge.2021.pred <- submission.format %>% 
+Fourati.2016.BioAge.2021.pred <- submission.format %>% 
    left_join(., df.BioAge.pred.2021, by="subject_id")
-Fourati.2015.BioAge.2021.pred[, c(5:11)] <- Fourati.2015.BioAge.2021.pred$rank.predictor
-Fourati.2015.BioAge.2021.pred <- Fourati.2015.BioAge.2021.pred[,c(1:18)] %>% 
+Fourati.2016.BioAge.2021.pred[, c(5:11)] <- Fourati.2016.BioAge.2021.pred$rank.predictor
+Fourati.2016.BioAge.2021.pred <- Fourati.2016.BioAge.2021.pred[,c(1:18)] %>% 
    dplyr::rename(Subject_ID = subject_id)
 # Save predictions
-write.table(Fourati.2015.BioAge.2021.pred, 
-            file = "Results/2021_predictions/fourati_2015_BioAge_CMI-PB_2021.tsv",
+write.table(Fourati.2016.BioAge.2021.pred, 
+            file = "Results/2021_predictions/fourati_2016_BioAge_CMI-PB_2021.tsv",
             quote=FALSE, sep='\t', row.names = FALSE)
 
 # M1 predictions
-Fourati.2015.M1.2021.pred <- submission.format %>% 
+Fourati.2016.M1.2021.pred <- submission.format %>% 
    left_join(., df.M1.pred.2021, by="subject_id")
-Fourati.2015.M1.2021.pred[, c(5:11)] <- Fourati.2015.M1.2021.pred$rank.predictor
-Fourati.2015.M1.2021.pred <- Fourati.2015.M1.2021.pred[,c(1:18)] %>% 
+Fourati.2016.M1.2021.pred[, c(5:11)] <- Fourati.2016.M1.2021.pred$rank.predictor
+Fourati.2016.M1.2021.pred <- Fourati.2016.M1.2021.pred[,c(1:18)] %>% 
    dplyr::rename(Subject_ID = subject_id)
 # Save predictions
-write.table(Fourati.2015.M1.2021.pred, 
-            file = "Results/2021_predictions/fourati_2015_M1_CMI-PB_2021.tsv",
+write.table(Fourati.2016.M1.2021.pred, 
+            file = "Results/2021_predictions/fourati_2016_M1_CMI-PB_2021.tsv",
             quote=FALSE, sep='\t', row.names = FALSE)
 
 # M1+M16 predictions
-Fourati.2015.M1.M16.2021.pred <- submission.format %>% 
+Fourati.2016.M1.M16.2021.pred <- submission.format %>% 
    left_join(., df.M1.M16.pred.2021, by="subject_id")
-Fourati.2015.M1.M16.2021.pred[, c(5:11)] <- Fourati.2015.M1.M16.2021.pred$rank.predictor
-Fourati.2015.M1.M16.2021.pred <- Fourati.2015.M1.M16.2021.pred[,c(1:18)] %>% 
+Fourati.2016.M1.M16.2021.pred[, c(5:11)] <- Fourati.2016.M1.M16.2021.pred$rank.predictor
+Fourati.2016.M1.M16.2021.pred <- Fourati.2016.M1.M16.2021.pred[,c(1:18)] %>% 
    dplyr::rename(Subject_ID = subject_id)
 # Save predictions
-write.table(Fourati.2015.M1.M16.2021.pred, 
-            file = "Results/2021_predictions/fourati_2015_M1+M16_CMI-PB_2021.tsv",
+write.table(Fourati.2016.M1.M16.2021.pred, 
+            file = "Results/2021_predictions/fourati_2016_M1+M16_CMI-PB_2021.tsv",
             quote=FALSE, sep='\t', row.names = FALSE)
 
 
 # Naive Bayes predictions
-Fourati.2015.NB.2021.pred <- submission.format %>% 
+Fourati.2016.NB.2021.pred <- submission.format %>% 
    left_join(., df.NB.pred.2021, by="subject_id")
-Fourati.2015.NB.2021.pred[, c(5:11)] <- Fourati.2015.NB.2021.pred$rank.predictor
-Fourati.2015.NB.2021.pred <- Fourati.2015.NB.2021.pred[,c(1:18)] %>% 
+Fourati.2016.NB.2021.pred[, c(5:11)] <- Fourati.2016.NB.2021.pred$rank.predictor
+Fourati.2016.NB.2021.pred <- Fourati.2016.NB.2021.pred[,c(1:18)] %>% 
    dplyr::rename(Subject_ID = subject_id)
 # Save predictions
-write.table(Fourati.2015.NB.2021.pred, 
-            file = "Results/2021_predictions/fourati_2015_NB_CMI-PB_2021.tsv",
+write.table(Fourati.2016.NB.2021.pred, 
+            file = "Results/2021_predictions/fourati_2016_NB_CMI-PB_2021.tsv",
             quote=FALSE, sep='\t', row.names = FALSE)
 
 # Logistic regression predictions
-Fourati.2015.LR.2021.pred <- submission.format %>% 
+Fourati.2016.LR.2021.pred <- submission.format %>% 
    left_join(., df.LR.pred.2021, by="subject_id")
-Fourati.2015.LR.2021.pred[, c(5:11)] <- Fourati.2015.LR.2021.pred$rank.predictor
-Fourati.2015.LR.2021.pred <- Fourati.2015.LR.2021.pred[,c(1:18)] %>% 
+Fourati.2016.LR.2021.pred[, c(5:11)] <- Fourati.2016.LR.2021.pred$rank.predictor
+Fourati.2016.LR.2021.pred <- Fourati.2016.LR.2021.pred[,c(1:18)] %>% 
    dplyr::rename(Subject_ID = subject_id)
 # Save predictions
-write.table(Fourati.2015.LR.2021.pred, 
-            file = "Results/2021_predictions/fourati_2015_LR_CMI-PB_2021.tsv",
+write.table(Fourati.2016.LR.2021.pred, 
+            file = "Results/2021_predictions/fourati_2016_LR_CMI-PB_2021.tsv",
             quote=FALSE, sep='\t', row.names = FALSE)
 
 
@@ -699,7 +698,7 @@ df.BioAge.2021.pred <- geneModuleCalc(gene.ex.data=ge.norm.2021.day0,
 
 
 # Evaluate gene signature with DESeq2 normalized gene expression
-Fourati.2015.BioAge.2021.results <- evaluateModel(df.prediction=df.BioAge.2021.pred,
+Fourati.2016.BioAge.2021.results <- evaluateModel(df.prediction=df.BioAge.2021.pred,
                                                   N.perm = 10000, direction = "missing",
                                                   add.to.title='- DESeq2 VST normalized',
                                                   score.label = 'BioAge score',
@@ -714,8 +713,8 @@ Fourati.2015.BioAge.2021.results <- evaluateModel(df.prediction=df.BioAge.2021.p
                                                   path='Results/2021/BioAge/')
 
 # Save results
-save(Fourati.2015.BioAge.2021.results, 
-     file = "Results/2021/BioAge/Fourati.2015.BioAge.2021.results.RData")
+save(Fourati.2016.BioAge.2021.results, 
+     file = "Results/2021/BioAge/Fourati.2016.BioAge.2021.results.RData")
 
 
 # Calculate the M1 BioAge score with DESeq2 normalized gene expression
@@ -727,7 +726,7 @@ df.M1.2021.pred <- geneModuleCalc(gene.ex.data=ge.norm.2021.day0,
                                   filter.ab.ag=selected.iso.ag)
 
 # Evaluate M1 BioAge score with DESeq2 normalized gene expression
-Fourati.2015.M1.2021.results <- evaluateModel(df.prediction=df.M1.2021.pred,
+Fourati.2016.M1.2021.results <- evaluateModel(df.prediction=df.M1.2021.pred,
                                               N.perm = 10000, direction = "missing",
                                               add.to.title='- DESeq2 VST normalized',
                                               score.label = 'M1 BioAge score',
@@ -741,8 +740,8 @@ Fourati.2015.M1.2021.results <- evaluateModel(df.prediction=df.M1.2021.pred,
                                               fn8='M1BioAge_vs_FC_boxplot',
                                               path = 'Results/2021/M1/')
 # Save results
-save(Fourati.2015.M1.2021.results, 
-     file = "Results/2021/M1/Fourati.2015.M1.2021.results.RData")
+save(Fourati.2016.M1.2021.results, 
+     file = "Results/2021/M1/Fourati.2016.M1.2021.results.RData")
 
 
 # Calculate the M1+M16 BioAge score with DESeq2 normalized gene expression
@@ -754,7 +753,7 @@ df.M1.M16.2021.pred <- geneModuleCalc(gene.ex.data=ge.norm.2021.day0,
                                       filter.ab.ag=selected.iso.ag)
 
 # Evaluate M1+M16 BioAge score with DESeq2 normalized gene expression
-Fourati.2015.M1.M16.2021.results <- evaluateModel(df.prediction=df.M1.M16.2021.pred,
+Fourati.2016.M1.M16.2021.results <- evaluateModel(df.prediction=df.M1.M16.2021.pred,
                                                   N.perm = 10000, direction = "missing",
                                                   add.to.title='- DESeq2 VST normalized',
                                                   score.label = 'M1+M16 BioAge score',
@@ -769,20 +768,20 @@ Fourati.2015.M1.M16.2021.results <- evaluateModel(df.prediction=df.M1.M16.2021.p
                                                   path = 'Results/2021/M1+M16/')
 
 # Save results
-save(Fourati.2015.M1.M16.2021.results, 
-     file = "Results/2021/M1+M16/Fourati.2015.M1.M16.2021.results.RData")
+save(Fourati.2016.M1.M16.2021.results, 
+     file = "Results/2021/M1+M16/Fourati.2016.M1.M16.2021.results.RData")
 
 # Calculate the gene signature score with DESeq2 normalized gene expression
 df.NB.2021.pred <- mlModelPredict(gene.ex.data=ge.norm.2021.day0,
                                   model=NB.fit, 
-                                  study='fourati_2015_NB',
+                                  study='fourati_2016_NB',
                                   post.ab.data=abt.2021.day14,
                                   pre.ab.data=abt.2021.day0,
                                   filter.ab.ag=selected.iso.ag,
                                   verbose=TRUE)
 
 # Evaluate gene signature with DESeq2 normalized gene expression
-Fourati.2015.NB.2021.results <- evaluateModel(df.prediction=df.NB.2021.pred,
+Fourati.2016.NB.2021.results <- evaluateModel(df.prediction=df.NB.2021.pred,
                                               N.perm = 10000, direction = "missing",
                                               add.to.title='- DESeq2 VST normalized',
                                               score.label = 'Ratio between post-probalities',
@@ -797,13 +796,13 @@ Fourati.2015.NB.2021.results <- evaluateModel(df.prediction=df.NB.2021.pred,
                                               path='Results/2021/Naive_bayes/')
 
 # Save results
-save(Fourati.2015.NB.2021.results, 
-     file = "Results/2021/Naive_bayes/Fourati.2015.NB.2021.results.RData")
+save(Fourati.2016.NB.2021.results, 
+     file = "Results/2021/Naive_bayes/Fourati.2016.NB.2021.results.RData")
 
 # Calculate the output of the logistic regression model with 4 cell populations
 df.LR.2021.pred <- mlModelPredict(cytof.data=cytof.2021.day0,
                                   populations=cell.populations.2021,
-                                  study='fourati_2015_LR', 
+                                  study='fourati_2016_LR', 
                                   model=LR.fit,
                                   year="2021",
                                   post.ab.data=abt.2021.day14,
@@ -812,7 +811,7 @@ df.LR.2021.pred <- mlModelPredict(cytof.data=cytof.2021.day0,
                                   verbose=TRUE)
 
 # Evaluate the logistic regression model with 4 cell populations
-Fourati.2015.LR.2021.results <- evaluateModel(df.prediction=df.LR.2021.pred, 
+Fourati.2016.LR.2021.results <- evaluateModel(df.prediction=df.LR.2021.pred, 
                                               direction = 'missing', N.perm = 10000,
                                               score.label='LR output - scale of the linear predictors',
                                               add.to.title = " - Logistic regression using cell populations",
@@ -827,8 +826,8 @@ Fourati.2015.LR.2021.results <- evaluateModel(df.prediction=df.LR.2021.pred,
                                               path = 'Results/2021/LR/')
 
 # Save results
-save(Fourati.2015.LR.2021.results, 
-     file = "Results/2021/LR/Fourati.2015.LR.2021.results.RData")
+save(Fourati.2016.LR.2021.results, 
+     file = "Results/2021/LR/Fourati.2016.LR.2021.results.RData")
 
 
 ```
