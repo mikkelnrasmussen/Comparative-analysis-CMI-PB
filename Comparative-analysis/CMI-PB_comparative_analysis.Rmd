@@ -65,8 +65,8 @@ load("../Study-7-Fourati-2021/Results/2020/RF_model/Fourati.2021.RF.2020.results
 load("../Study-8-Bartholomeus-2018/Results/2020/Gene_signature/Bartholomeus.2018.gene.sig.2020.results.RData")
 load("../Study-8-Bartholomeus-2018/Results/2020/Naive_bayes/Bartholomeus.2018.NB.2020.results.RData")
 
-# Study 9 - Qui et al. 2018 
-load("../Study-9-Qui-2018/Results/2020/Gene_signature/Qui.2018.gene.sig.2020.results.TPM.RData")
+# Study 9 - Qiu et al. 2018 
+load("../Study-9-Qiu-2018/Results/2020/Gene_signature/Qiu.2018.gene.sig.2020.results.TPM.RData")
 
 # Study 10 - Franco et al. 2013
 load("../Study-10-Franco-2013/Results/2020/GeneSig/Franco.2013.gene.sig.2020.results.TPM.RData")
@@ -94,7 +94,7 @@ df.2020.combined <- list(Avey.2017.gene.sig = Avey.2017.gene.sig.2020.results, #
                          Fourati.2021.RF = Fourati.2021.RF.2020.results, # Multiple vaccines
                          Bartholomeus.2018.gene.sig = Bartholomeus.2018.gene.sig.2020.results, # HBV
                          Bartholomeus.2018.NB = Bartholomeus.2018.NB.2020.results, # HBV
-                         Qui.2018.gene.sig = Qui.2018.gene.sig.2020.results.TPM, # HBV
+                         Qiu.2018.gene.sig = Qiu.2018.gene.sig.2020.results.TPM, # HBV
                          Franco.2013.gene.sig = Franco.2013.gene.sig.2020.results.TPM) # Influenza
 
 
@@ -143,8 +143,8 @@ load("../Study-7-Fourati-2021/Results/2021/RF_model/Fourati.2021.RF.2021.results
 load("../Study-8-Bartholomeus-2018/Results/2021/Gene_signature/Bartholomeus.2018.gene.sig.2021.results.RData")
 load("../Study-8-Bartholomeus-2018/Results/2021/Naive_bayes/Bartholomeus.2018.NB.2021.results.RData")
 
-# Study 9 - Qui et al. 2018 
-load("../Study-9-Qui-2018/Results/2021/Gene_signature/Qui.2018.gene.sig.2021.results.RData")
+# Study 9 - Qiu et al. 2018 
+load("../Study-9-Qiu-2018/Results/2021/Gene_signature/Qiu.2018.gene.sig.2021.results.RData")
 
 # Study 10 - Franco et al. 2013
 load("../Study-10-Franco-2013/Results/2021/GeneSig/Franco.2013.gene.sig.2021.results.RData")
@@ -173,7 +173,7 @@ df.2021.combined <- list(Avey.2017.gene.sig = Avey.2017.gene.sig.2021.results, #
                          Fourati.2021.RF = Fourati.2021.RF.2021.results, # Multiple vaccines
                          Bartholomeus.2018.gene.sig = Bartholomeus.2018.gene.sig.2021.results, # HBV
                          Bartholomeus.2018.NB = Bartholomeus.2018.NB.2021.results, # HBV
-                         Qui.2018.gene.sig = Qui.2018.gene.sig.2021.results, # HBV
+                         Qiu.2018.gene.sig = Qiu.2018.gene.sig.2021.results, # HBV
                          Franco.2013.gene.sig = Franco.2013.gene.sig.2021.results) # Influenza
 
 
