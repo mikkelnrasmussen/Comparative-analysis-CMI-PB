@@ -385,14 +385,14 @@ ggsave(filename="2020/Heatmap_AUC_FC_2020.png",
 df.collect.corr.day14.2021 <- collectData(data=df.2021.combined, metric="spearman", outcome = "raw")
 plotHeatmap(df.collect.corr.day14.2021, x="model", y="isotype_antigen", metric = "spearman",
             value="corr.value", label1 = "corr.label", label2 = "stars")
-ggsave(filename="2021/Heatmap_Spearman_day14.png", 
+ggsave(filename="2021/Heatmap_Spearman_day14_2021.png", 
        dpi = 400, width = 18, height = 8)
 
 ### AUC
 df.collect.auc.day14.2021 <- collectData(data=df.2021.combined, metric="AUC", outcome = "raw")
 plotHeatmap(df.collect.auc.day14.2021, x="model", y="isotype_antigen", metric = "AUC",
             value="auc.score", label1 = "auc.label", label2 = "stars")
-ggsave(filename="2021/Heatmap_AUC_day14.png", 
+ggsave(filename="2021/Heatmap_AUC_day14_2021.png", 
        dpi = 400, width = 18, height = 8)
 
 
@@ -402,7 +402,7 @@ df.collect.corr.FC.2021 <- collectData(data=df.2021.combined, metric="spearman",
                                outcome = "fc")
 plotHeatmap(df.collect.corr.FC.2021, x="model", y="isotype_antigen", metric = "spearman",
             value="corr.value", label1 = "corr.label", label2 = "stars")
-ggsave(filename="2021/Heatmap_Spearman_FC.png", 
+ggsave(filename="2021/Heatmap_Spearman_FC_2021.png", 
        dpi = 400, width = 18, height = 8)
 
 ### AUC
@@ -410,7 +410,7 @@ df.collect.auc.FC.2021 <- collectData(data=df.2021.combined, metric="AUC",
                               outcome = "fc")
 plotHeatmap(df.collect.auc.FC.2021, x="model", y="isotype_antigen", metric = "AUC",
             value="auc.score", label1 = "auc.label", label2 = "stars")
-ggsave(filename="2021/Heatmap_AUC_FC.png", 
+ggsave(filename="2021/Heatmap_AUC_FC_2021.png", 
        dpi = 400, width = 18, height = 8)
 ```
 ## Comparison of results from 2020 to 2021
