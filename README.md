@@ -13,4 +13,4 @@ The repository contains a folder containing a Rmarkdown file of the workflow for
 
 - After the data has been downloaded and processed, the Rmarkdown files for each of the studies can be run. These files contains the workflows for evaluating all of the prediction methods included in this project.
 
-- Finaly, the comparative analysis can be run to compare the results from all of the prediction methods.
+- Finally, the comparative analysis can be run to compare the results from all of the prediction methods.
