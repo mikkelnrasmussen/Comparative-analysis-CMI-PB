@@ -15,8 +15,6 @@ knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
 
 ```{r load libaries, echo=FALSE}
 
-PROJECT_DIR <- "/Users/mrasmussen/OneDrive - Danmarks Tekniske Universitet/Teknisk_Biomedicin/6_semester/Bachelorproject/Study_3-Kotliarov/baseline"
-
 setwd(dirname(rstudioapi::getSourceEditorContext()$path))
 
 suppressMessages(library('data.table'))
@@ -107,16 +105,15 @@ load_sig <- function(data=NULL, col=NULL, desc.order=T, ntop) {
 ```{r}
 
 # Load CD38 (TGSig) signature genes
-fn.cd38.cor <- file.path(PROJECT_DIR, "generated_data", "CHI", 
-                        "robust_corr_genes.txt")
+fn.cd38.cor <- file.path("robust_corr_genes.txt")
 TGSig.gene.sig <- load_sig(fn.cd38.cor, "cor.mean.sd.ratio", ntop=10)
 
 
 # Load SLE-Sig (87 leading edge genes from the brown module)
-SLE_Sig.gene.sig <- fread(file.path(PROJECT_DIR,                               "generated_data/fgsea_with_wgcna_modules/brown-leading-edge-isv050-87genes.txt"))$gene
+SLE_Sig.gene.sig <- fread("brown-leading-edge-isv050-87genes.txt")$gene
 
 # Load IFN-I-DCact gene signature 
-fn.sig <- file.path(PROJECT_DIR, "generated_data", "signatures", "IFN26_ge_sig.txt")
+fn.sig <- file.path("IFN26_ge_sig.txt")
 IFN_I_DCact.gene.sig <- fread(fn.sig, header = F) %>% unlist(use.names=F)
 
 ```
@@ -196,7 +193,8 @@ df.TGSig.2020.pred.TPM <- geneSigCalc(gene.ex.data=ge.TPM.2020.day0.T,
                                       gene.sig=TGSig.gene.sig, 
                                       post.ab.data=abt.2020.day14,
                                       pre.ab.data=abt.2020.day0,
-                                      filter.ab.ag=selected.iso.ag)
+                                      filter.ab.ag=selected.iso.ag,
+                                      verbose=TRUE)
 
 # Evaluate gene signature with TPM normalized gene expression
 Kotliarov.2020.TGSig.2020.results.TPM <- evaluateModel(df.prediction=df.TGSig.2020.pred.TPM,
